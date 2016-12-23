@@ -2,14 +2,19 @@
 
 const assert = require('proclaim');
 const mockery = require('mockery');
+const sinon = require('sinon');
 
 describe('lib/origami-service', () => {
 	let express;
+	let defaults;
 	let origamiService;
 
 	beforeEach(() => {
 		express = require('../mock/express.mock');
 		mockery.registerMock('express', express);
+
+		defaults = sinon.spy(require('lodash/defaultsDeep'));
+		mockery.registerMock('lodash/defaultsDeep', defaults);
 
 		origamiService = require('../../..');
 	});
@@ -18,24 +23,58 @@ describe('lib/origami-service', () => {
 		assert.isFunction(origamiService);
 	});
 
-	describe('origamiService()', () => {
+	it('has a `defaults` property', () => {
+		assert.isObject(origamiService.defaults);
+	});
+
+	describe('.defaults', () => {
+
+		it('has a `port` property', () => {
+			assert.strictEqual(origamiService.defaults.port, 8080);
+		});
+
+		it('has a `region` property', () => {
+			assert.strictEqual(origamiService.defaults.region, 'EU');
+		});
+
+	});
+
+	describe('origamiService(options)', () => {
+		let options;
 		let returnedPromise;
 
 		beforeEach(() => {
-			returnedPromise = origamiService();
+			options = {
+				port: 1234
+			};
+			returnedPromise = origamiService(options);
 		});
 
 		it('returns a promise', () => {
 			assert.instanceOf(returnedPromise, Promise);
 		});
 
+		it('defaults the passed in options using `origamiService.defaults`', () => {
+			assert.isObject(defaults.firstCall.args[0]);
+			assert.strictEqual(defaults.firstCall.args[1], options);
+			assert.strictEqual(defaults.firstCall.args[2], origamiService.defaults);
+		});
+
 		it('creates an Express application', () => {
 			assert.calledOnce(express);
 		});
 
-		it('starts the Express application on a random port', () => {
+		it('stores additional data in the `app.origami` object', () => {
+			assert.isObject(express.mockApp.origami);
+		});
+
+		it('stores the defaulted options in `app.origami.options`', () => {
+			assert.strictEqual(express.mockApp.origami.options, defaults.firstCall.returnValue);
+		});
+
+		it('starts the Express application on the configured port', () => {
 			assert.calledOnce(express.mockApp.listen);
-			assert.calledWith(express.mockApp.listen, null);
+			assert.calledWith(express.mockApp.listen, options.port);
 		});
 
 		describe('.then()', () => {
@@ -47,12 +86,8 @@ describe('lib/origami-service', () => {
 				});
 			});
 
-			it('resolves with the created Express application (app)', () => {
+			it('resolves with the created Express application', () => {
 				assert.strictEqual(app, express.mockApp);
-			});
-
-			it('stores additional data in the `app.origami` object', () => {
-				assert.isObject(app.origami);
 			});
 
 			it('stores the created server in `app.origami.server`', () => {

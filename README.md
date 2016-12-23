@@ -7,6 +7,7 @@ Provides an extended [Express], as well as useful tools for building consistent 
   - [Usage](#usage)
     - [Requirements](#requirements)
     - [API Documentation](#api-documentation)
+    - [Options](#options)
     - [Examples](#examples)
   - [Contributing](#contributing)
   - [Contact](#contact)
@@ -32,23 +33,35 @@ This library makes use of [promises], and provides a wrapper around [Express] â€
 const origamiService = require('@financial-times/origami-service');
 ```
 
-### `origamiService()`
+### `origamiService( [options] )`
 
 This function returns a promise which resolves with a new [Express] application. The Express application will be started automatically, and the returned promise will reject if there's an error in startup.
 
+You can configure the created service with [an options object](#options) if you need to override some defaults.
+
 ```js
-origamiService()
-	.then(app => {
-		// do something with the app
-	})
-	.catch(error => {
-		// handle the error
-	});
+origamiService({
+    port: 1234
+})
+.then(app => {
+    // do something with the app
+})
+.catch(error => {
+    // handle the error
+});
 ```
 
 The Express application will have some additional properties, added by the Origami Service module:
 
+  - `app.origami.options`: The defaulted [options](#options) passed into the `origamiService` call
   - `app.origami.server`: The [HTTP Server] which was returned by `app.listen`
+
+### Options
+
+The Origami Service module can be configured with a variety of options, passed in as an object to the `origamiService` function:
+
+  - `port`: The port that the application should run on. Defaults to `8080`
+  - `region`: The region to use in logging and reporting for the application. Defaults to `'EU'`
 
 ### Examples
 
@@ -58,6 +71,12 @@ You can find example implementations of Origami-compliant services in the `examp
 
     ```sh
     node examples/basic
+    ```
+
+  - **Options:** start an Origami service with some overridden [options](#options):
+
+    ```sh
+    node examples/options
     ```
 
 
