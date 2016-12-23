@@ -44,9 +44,16 @@ describe('lib/origami-service', () => {
 		let returnedPromise;
 
 		beforeEach(() => {
+
+			// Define options in the environment and
+			// as an object (which takes priority)
+			process.env.PORT = 5678;
+			process.env.REGION = 'The Moon';
 			options = {
-				port: 1234
+				port: 1234,
+				region: 'US'
 			};
+
 			returnedPromise = origamiService(options);
 		});
 
@@ -54,10 +61,14 @@ describe('lib/origami-service', () => {
 			assert.instanceOf(returnedPromise, Promise);
 		});
 
-		it('defaults the passed in options using `origamiService.defaults`', () => {
+		it('defaults the passed in options', () => {
 			assert.isObject(defaults.firstCall.args[0]);
 			assert.strictEqual(defaults.firstCall.args[1], options);
-			assert.strictEqual(defaults.firstCall.args[2], origamiService.defaults);
+			assert.deepEqual(defaults.firstCall.args[2], {
+				port: process.env.PORT,
+				region: process.env.REGION
+			});
+			assert.strictEqual(defaults.firstCall.args[3], origamiService.defaults);
 		});
 
 		it('creates an Express application', () => {

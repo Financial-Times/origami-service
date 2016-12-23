@@ -37,7 +37,7 @@ const origamiService = require('@financial-times/origami-service');
 
 This function returns a promise which resolves with a new [Express] application. The Express application will be started automatically, and the returned promise will reject if there's an error in startup.
 
-You can configure the created service with [an options object](#options) if you need to override some defaults.
+You can configure the created service with [an options object](#options) if you need to override any defaults.
 
 ```js
 origamiService({
@@ -58,10 +58,16 @@ The Express application will have some additional properties, added by the Origa
 
 ### Options
 
-The Origami Service module can be configured with a variety of options, passed in as an object to the `origamiService` function:
+The Origami Service module can be configured with a variety of options, passed in as an object to the `origamiService` function or as [environment variables]. The priority given to each type of configuration is important:
 
-  - `port`: The port that the application should run on. Defaults to `8080`
-  - `region`: The region to use in logging and reporting for the application. Defaults to `'EU'`
+  1. **Options object:** options passed in as an `options` object will take priority over everything. E.g. this means if you hard-code the `port` configuration in your code, the `PORT` environment variable will cease to work.
+  2. **Environment:** if an option isn't found in the `options` object, then for some options an environment variable will be checked. The names of these are slightly different, and will be documented below.
+  3. **Defaults:** if an option isn't found in the `options` object _or_ environment, then it will use the default value as documented below.
+
+The available options are as follows. Where two names are separated by a `/`, the first is the object key and the second is the environment variable:
+
+  - `port/PORT`: The port that the application should run on. Defaults to `8080`
+  - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
 
 ### Examples
 
@@ -105,6 +111,7 @@ This software is published by the Financial Times under the [MIT licence][licens
 
 
 [#ft-origami]: https://financialtimes.slack.com/messages/ft-origami/
+[environment variables]: https://en.wikipedia.org/wiki/Environment_variable
 [express]: http://expressjs.com/
 [http server]: https://nodejs.org/api/http.html#http_class_http_server
 [issues]: https://github.com/Financial-Times/origami-service/issues
