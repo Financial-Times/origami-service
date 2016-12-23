@@ -1,0 +1,38 @@
+{
+  "name": "@financial-times/origami-service",
+  "version": "0.0.0",
+  "description": "Provides an extended Express, as well as useful tools for building consistent Origami services.",
+  "keywords": [
+    "origami"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Financial-Times/origami-service",
+  "bugs": {
+    "url": "https://github.com/Financial-Times/origami-service/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Financial-Times/origami-service.git"
+  },
+  "engines": {
+    "node": "^6",
+    "npm": "^4"
+  },
+  "main": "./lib/origami-service.js",
+  "scripts": {
+    "test": "make verify test"
+  },
+  "dependencies": {
+    "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "eslint": "^2.13.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^2.5.3",
+    "mockery": "^1.7.0",
+    "proclaim": "^3.4.4",
+    "sinon": "^1.17.6",
+    "sinon-as-promised": "^4.0.2",
+    "supertest": "^1.2.0"
+  }
+}
