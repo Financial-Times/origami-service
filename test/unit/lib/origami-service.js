@@ -37,6 +37,10 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(origamiService.defaults.region, 'EU');
 		});
 
+		it('has a `start` property', () => {
+			assert.strictEqual(origamiService.defaults.start, true);
+		});
+
 	});
 
 	describe('origamiService(options)', () => {
@@ -83,11 +87,6 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(express.mockApp.origami.options, defaults.firstCall.returnValue);
 		});
 
-		it('starts the Express application on the configured port', () => {
-			assert.calledOnce(express.mockApp.listen);
-			assert.calledWith(express.mockApp.listen, options.port);
-		});
-
 		describe('.then()', () => {
 			let app;
 
@@ -103,6 +102,35 @@ describe('lib/origami-service', () => {
 
 			it('stores the created server in `app.origami.server`', () => {
 				assert.strictEqual(app.origami.server, express.mockServer);
+			});
+
+		});
+
+		describe('when `options.start` is set to `false`', () => {
+
+			beforeEach(() => {
+				express.mockApp.listen.reset();
+				options.start = false;
+				returnedPromise = origamiService(options);
+			});
+
+			describe('.then()', () => {
+				let app;
+
+				beforeEach(() => {
+					return returnedPromise.then(value => {
+						app = value;
+					});
+				});
+
+				it('does not start the Express application', () => {
+					assert.notCalled(express.mockApp.listen);
+				});
+
+				it('resolves with the created Express application', () => {
+					assert.strictEqual(app, express.mockApp);
+				});
+
 			});
 
 		});

@@ -68,6 +68,7 @@ The available options are as follows. Where two names are separated by a `/`, th
 
   - `port/PORT`: The port that the application should run on. Defaults to `8080`
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
+  - `start`: Whether to automatically start the application. Defaults to `true`
 
 ### Examples
 
