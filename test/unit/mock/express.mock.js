@@ -12,18 +12,22 @@ const mockApp = module.exports.mockApp = {
 	set: sinon.stub(),
 	use: sinon.stub()
 };
-const mockServer = module.exports.mockServer = {};
+const mockServer = express.mockServer = {};
 
 express.returns(mockApp);
 mockApp.listen.returns(mockServer).yieldsAsync();
 
-module.exports.mockRequest = {
+express.static = sinon.stub();
+express.mockStaticMiddleware = sinon.stub();
+express.static.returns(express.mockStaticMiddleware);
+
+express.mockRequest = {
 	headers: {},
 	query: {},
 	params: {}
 };
 
-module.exports.mockResponse = {
+express.mockResponse = {
 	app: mockApp,
 	locals: {},
 	redirect: sinon.stub().returnsThis(),

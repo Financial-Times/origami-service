@@ -5,7 +5,9 @@
 const origamiService = require('../..');
 
 // Create and run an Origami service
-origamiService()
+origamiService({
+	basePath: __dirname
+})
 
 	// When the service starts log that everything
 	// is OK and output the address

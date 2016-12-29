@@ -29,6 +29,14 @@ describe('lib/origami-service', () => {
 
 	describe('.defaults', () => {
 
+		it('has a `basePath` property', () => {
+			assert.strictEqual(origamiService.defaults.basePath, process.cwd());
+		});
+
+		it('has an `environment` property', () => {
+			assert.strictEqual(origamiService.defaults.environment, 'development');
+		});
+
 		it('has a `port` property', () => {
 			assert.strictEqual(origamiService.defaults.port, 8080);
 		});
@@ -53,7 +61,10 @@ describe('lib/origami-service', () => {
 			// as an object (which takes priority)
 			process.env.PORT = 5678;
 			process.env.REGION = 'The Moon';
+			process.env.NODE_ENV = 'production';
 			options = {
+				basePath: 'mock-base-path',
+				environment: 'test',
 				port: 1234,
 				region: 'US'
 			};
@@ -69,6 +80,7 @@ describe('lib/origami-service', () => {
 			assert.isObject(defaults.firstCall.args[0]);
 			assert.strictEqual(defaults.firstCall.args[1], options);
 			assert.deepEqual(defaults.firstCall.args[2], {
+				environment: process.env.NODE_ENV,
 				port: process.env.PORT,
 				region: process.env.REGION
 			});
@@ -79,12 +91,27 @@ describe('lib/origami-service', () => {
 			assert.calledOnce(express);
 		});
 
+		it('creates and mounts Express static middleware', () => {
+			assert.calledOnce(express.static);
+			assert.calledWithExactly(express.static, 'mock-base-path/public', {
+				maxAge: 0
+			});
+			assert.calledWithExactly(express.mockApp.use, express.mockStaticMiddleware);
+		});
+
 		it('stores additional data in the `app.origami` object', () => {
 			assert.isObject(express.mockApp.origami);
 		});
 
 		it('stores the defaulted options in `app.origami.options`', () => {
 			assert.strictEqual(express.mockApp.origami.options, defaults.firstCall.returnValue);
+		});
+
+		it('stores useful application paths in `app.origami.paths`', () => {
+			assert.deepEqual(express.mockApp.origami.paths, {
+				base: 'mock-base-path',
+				public: 'mock-base-path/public'
+			});
 		});
 
 		describe('.then()', () => {
@@ -102,6 +129,23 @@ describe('lib/origami-service', () => {
 
 			it('stores the created server in `app.origami.server`', () => {
 				assert.strictEqual(app.origami.server, express.mockServer);
+			});
+
+		});
+
+		describe('when `options.environment` is set to "production"', () => {
+
+			beforeEach(() => {
+				express.static.reset();
+				options.environment = 'production';
+				returnedPromise = origamiService(options);
+			});
+
+			it('creates and mounts Express static middleware with a week long max-age', () => {
+				assert.calledOnce(express.static);
+				assert.calledWithExactly(express.static, 'mock-base-path/public', {
+					maxAge: 604800000
+				});
 			});
 
 		});

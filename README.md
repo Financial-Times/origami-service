@@ -66,6 +66,8 @@ The Origami Service module can be configured with a variety of options, passed i
 
 The available options are as follows. Where two names are separated by a `/`, the first is the object key and the second is the environment variable:
 
+  - `basePath`: The base path of the application, which paths (e.g. public files) will be relative to. Defaults to `process.cwd()`.
+  - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`.
   - `port/PORT`: The port that the application should run on. Defaults to `8080`
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
   - `start`: Whether to automatically start the application. Defaults to `true`
