@@ -70,6 +70,7 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`.
   - `port/PORT`: The port that the application should run on. Defaults to `8080`
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
+  - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`.
   - `start`: Whether to automatically start the application. Defaults to `true`
 
 ### Examples
@@ -119,6 +120,7 @@ This software is published by the Financial Times under the [MIT licence][licens
 [http server]: https://nodejs.org/api/http.html#http_class_http_server
 [issues]: https://github.com/Financial-Times/origami-service/issues
 [license]: http://opensource.org/licenses/MIT
+[morgan]: https://github.com/expressjs/morgan
 [node.js]: https://nodejs.org/
 [npm]: https://www.npmjs.com/
 [origami support]: mailto:origami-support@ft.com

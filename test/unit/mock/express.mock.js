@@ -23,6 +23,7 @@ express.static.returns(express.mockStaticMiddleware);
 
 express.mockRequest = {
 	headers: {},
+	path: '/',
 	query: {},
 	params: {}
 };

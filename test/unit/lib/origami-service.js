@@ -7,6 +7,7 @@ const sinon = require('sinon');
 describe('lib/origami-service', () => {
 	let express;
 	let defaults;
+	let morgan;
 	let origamiService;
 
 	beforeEach(() => {
@@ -15,6 +16,9 @@ describe('lib/origami-service', () => {
 
 		defaults = sinon.spy(require('lodash/defaultsDeep'));
 		mockery.registerMock('lodash/defaultsDeep', defaults);
+
+		morgan = require('../mock/morgan.mock');
+		mockery.registerMock('morgan', morgan);
 
 		origamiService = require('../../..');
 	});
@@ -45,6 +49,10 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(origamiService.defaults.region, 'EU');
 		});
 
+		it('has a `requestLogFormat` property', () => {
+			assert.strictEqual(origamiService.defaults.requestLogFormat, 'combined');
+		});
+
 		it('has a `start` property', () => {
 			assert.strictEqual(origamiService.defaults.start, true);
 		});
@@ -66,7 +74,8 @@ describe('lib/origami-service', () => {
 				basePath: 'mock-base-path',
 				environment: 'test',
 				port: 1234,
-				region: 'US'
+				region: 'US',
+				requestLogFormat: 'mock-log-format'
 			};
 
 			returnedPromise = origamiService(options);
@@ -89,6 +98,68 @@ describe('lib/origami-service', () => {
 
 		it('creates an Express application', () => {
 			assert.calledOnce(express);
+		});
+
+		it('creates and mounts Morgan middleware', () => {
+			assert.calledOnce(morgan);
+			assert.calledWith(morgan, 'mock-log-format');
+			assert.isObject(morgan.firstCall.args[1]);
+			assert.isFunction(morgan.firstCall.args[1].skip);
+			assert.calledWithExactly(express.mockApp.use, morgan.mockMiddleware);
+		});
+
+		describe('Morgan `skip` option function', () => {
+			let returnedValue;
+			let skip;
+
+			beforeEach(() => {
+				skip = morgan.firstCall.args[1].skip;
+				returnedValue = skip(express.mockRequest);
+			});
+
+			it('returns `false`', () => {
+				assert.isFalse(returnedValue);
+			});
+
+			describe('when `request.path` is `"/favicon.ico"`', () => {
+
+				beforeEach(() => {
+					express.mockRequest.path = '/favicon.ico';
+					returnedValue = skip(express.mockRequest);
+				});
+
+				it('returns `true`', () => {
+					assert.isTrue(returnedValue);
+				});
+
+			});
+
+			describe('when the last part of `request.path` begins with a double underscore', () => {
+
+				beforeEach(() => {
+					express.mockRequest.path = '/foo/bar/__health';
+					returnedValue = skip(express.mockRequest);
+				});
+
+				it('returns `true`', () => {
+					assert.isTrue(returnedValue);
+				});
+
+			});
+
+			describe('when the first part of `request.path` begins with a double underscore', () => {
+
+				beforeEach(() => {
+					express.mockRequest.path = '/__origami/foo/bar/';
+					returnedValue = skip(express.mockRequest);
+				});
+
+				it('returns `false`', () => {
+					assert.isFalse(returnedValue);
+				});
+
+			});
+
 		});
 
 		it('creates and mounts Express static middleware', () => {
@@ -146,6 +217,22 @@ describe('lib/origami-service', () => {
 				assert.calledWithExactly(express.static, 'mock-base-path/public', {
 					maxAge: 604800000
 				});
+			});
+
+		});
+
+		describe('when `options.requestLogFormat` is set to `null`', () => {
+
+			beforeEach(() => {
+				morgan.reset();
+				express.mockApp.use.reset();
+				options.requestLogFormat = null;
+				returnedPromise = origamiService(options);
+			});
+
+			it('does not create and mount Morgan middleware', () => {
+				assert.notCalled(morgan);
+				assert.neverCalledWith(express.mockApp.use, morgan.mockMiddleware);
 			});
 
 		});
