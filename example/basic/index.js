@@ -6,16 +6,12 @@ const origamiService = require('../..');
 
 // Create and run an Origami service
 origamiService({
+	name: 'Origami Service Basic Example',
 	basePath: __dirname
 })
 
 	// When the service starts...
 	.then(app => {
-
-		// log that everything is OK and output the address
-		const port = app.origami.server.address().port;
-		const address = `http://localhost:${port}/`;
-		console.log(`Application started: ${address}`);
 
 		// Create a route
 		app.get('/', (request, response) => {

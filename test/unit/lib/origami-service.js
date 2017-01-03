@@ -7,6 +7,7 @@ const sinon = require('sinon');
 describe('lib/origami-service', () => {
 	let express;
 	let defaults;
+	let log;
 	let morgan;
 	let notFound;
 	let origamiService;
@@ -15,8 +16,11 @@ describe('lib/origami-service', () => {
 		express = require('../mock/express.mock');
 		mockery.registerMock('express', express);
 
-		defaults = sinon.spy(require('lodash/defaultsDeep'));
-		mockery.registerMock('lodash/defaultsDeep', defaults);
+		defaults = sinon.spy(require('lodash/defaults'));
+		mockery.registerMock('lodash/defaults', defaults);
+
+		log = require('../mock/log.mock');
+		mockery.registerMock('log', log);
 
 		morgan = require('../mock/morgan.mock');
 		mockery.registerMock('morgan', morgan);
@@ -43,6 +47,14 @@ describe('lib/origami-service', () => {
 
 		it('has an `environment` property', () => {
 			assert.strictEqual(origamiService.defaults.environment, 'development');
+		});
+
+		it('has a `log` property', () => {
+			assert.strictEqual(origamiService.defaults.log, console);
+		});
+
+		it('has a `name` property', () => {
+			assert.strictEqual(origamiService.defaults.name, 'Origami Service');
 		});
 
 		it('has a `port` property', () => {
@@ -89,6 +101,8 @@ describe('lib/origami-service', () => {
 			options = {
 				basePath: 'mock-base-path',
 				environment: 'test',
+				log: log,
+				name: 'Test App',
 				port: 1234,
 				region: 'US',
 				requestLogFormat: 'mock-log-format'
@@ -201,6 +215,10 @@ describe('lib/origami-service', () => {
 			});
 		});
 
+		it('stores the logger in `app.origami.log`', () => {
+			assert.strictEqual(express.mockApp.origami.log.info, options.log.info);
+		});
+
 		describe('.then()', () => {
 			let app;
 
@@ -216,6 +234,10 @@ describe('lib/origami-service', () => {
 
 			it('stores the created server in `app.origami.server`', () => {
 				assert.strictEqual(app.origami.server, express.mockServer);
+			});
+
+			it('logs that the application has started', () => {
+				assert.calledWith(log.info, 'Test App started (env=test port=1234)');
 			});
 
 		});
@@ -256,6 +278,7 @@ describe('lib/origami-service', () => {
 		describe('when `options.start` is set to `false`', () => {
 
 			beforeEach(() => {
+				log.info.reset();
 				express.mockApp.listen.reset();
 				options.start = false;
 				returnedPromise = origamiService(options);
@@ -278,6 +301,10 @@ describe('lib/origami-service', () => {
 					assert.strictEqual(app, express.mockApp);
 				});
 
+				it('does not log that the application has started', () => {
+					assert.neverCalledWith(log.info, 'Test App started (env=test port=1234)');
+				});
+
 			});
 
 		});
@@ -286,6 +313,8 @@ describe('lib/origami-service', () => {
 			let expressError;
 
 			beforeEach(() => {
+				options.log.info.reset();
+				options.log.error.reset();
 				expressError = new Error('Express failed to start');
 				express.mockApp.listen.yieldsAsync(expressError);
 			});
@@ -294,13 +323,21 @@ describe('lib/origami-service', () => {
 				let caughtError;
 
 				beforeEach(() => {
-					return origamiService().catch(error => {
+					return origamiService(options).catch(error => {
 						caughtError = error;
 					});
 				});
 
 				it('rejects with the Express error', () => {
 					assert.strictEqual(caughtError, expressError);
+				});
+
+				it('does not log that the application has started', () => {
+					assert.neverCalledWith(log.info, 'Test App started (env=test port=1234)');
+				});
+
+				it('logs that the application has errored', () => {
+					assert.calledWith(log.error, `Test App startup error (${expressError.message})`);
 				});
 
 			});
