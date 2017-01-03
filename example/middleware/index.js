@@ -22,6 +22,9 @@ origamiService({
 			response.send('Hello World!');
 		});
 
+		// Mount some error handling middleware
+		app.use(origamiService.middleware.notFound('The requested page does not exist'));
+
 	})
 
 	// Catch and log any startup errors

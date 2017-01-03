@@ -73,6 +73,24 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`.
   - `start`: Whether to automatically start the application. Defaults to `true`
 
+### `origamiService.middleware.notFound( [message] )`
+
+Create and return a middleware for throwing `404` "Not Found" errors. The returned middleware will pass on an error which can be caught later by an error handling middleware. The error will have a `status` property set to `404` so that your error handler can differentiate it from other errors.
+
+This middleware should be mounted after all of your application routes:
+
+```js
+// routes go here
+app.use(origamiService.middleware.notFound());
+// error handler goes here
+```
+
+By default, the error message will be set to `'Not Found'`. If you wish to specify a custom message you can specify one as a parameter:
+
+```js
+app.use(origamiService.middleware.notFound('This page does not exist'));
+```
+
 ### Examples
 
 You can find example implementations of Origami-compliant services in the `examples` folder of this repo:
@@ -87,6 +105,12 @@ You can find example implementations of Origami-compliant services in the `examp
 
     ```sh
     node examples/options
+    ```
+
+  - **Middleware:** start an Origami service using some of the built-in middleware:
+
+    ```sh
+    node examples/middleware
     ```
 
 

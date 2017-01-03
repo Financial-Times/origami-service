@@ -8,6 +8,7 @@ describe('lib/origami-service', () => {
 	let express;
 	let defaults;
 	let morgan;
+	let notFound;
 	let origamiService;
 
 	beforeEach(() => {
@@ -19,6 +20,9 @@ describe('lib/origami-service', () => {
 
 		morgan = require('../mock/morgan.mock');
 		mockery.registerMock('morgan', morgan);
+
+		notFound = sinon.stub();
+		mockery.registerMock('./middleware/not-found', notFound);
 
 		origamiService = require('../../..');
 	});
@@ -55,6 +59,18 @@ describe('lib/origami-service', () => {
 
 		it('has a `start` property', () => {
 			assert.strictEqual(origamiService.defaults.start, true);
+		});
+
+	});
+
+	it('has a `middleware` property', () => {
+		assert.isObject(origamiService.middleware);
+	});
+
+	describe('.middleware', () => {
+
+		it('has a `notFound` property which references `lib/middleware/not-found`', () => {
+			assert.strictEqual(origamiService.middleware.notFound, notFound);
 		});
 
 	});
