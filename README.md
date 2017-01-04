@@ -56,6 +56,16 @@ The Express application will have some additional properties, added by the Origa
   - `app.origami.options`: The defaulted [options](#options) passed into the `origamiService` call
   - `app.origami.server`: The [HTTP Server] which was returned by `app.listen`
 
+The following [Express settings] will be set:
+
+  - `json spaces`: Configured to prettify output JSON
+  - `x-powered-by`: Disabled
+
+Some middleware will also be mounted by default, in this order:
+
+  - [Morgan]: To log requests
+  - [Static]: To serve files in the application's `public` folder
+
 ### Options
 
 The Origami Service module can be configured with a variety of options, passed in as an object to the `origamiService` function or as [environment variables]. The priority given to each type of configuration is important:
@@ -143,6 +153,7 @@ This software is published by the Financial Times under the [MIT licence][licens
 [#ft-origami]: https://financialtimes.slack.com/messages/ft-origami/
 [environment variables]: https://en.wikipedia.org/wiki/Environment_variable
 [express]: http://expressjs.com/
+[express settings]: https://expressjs.com/en/4x/api.html#app.settings.table
 [http server]: https://nodejs.org/api/http.html#http_class_http_server
 [issues]: https://github.com/Financial-Times/origami-service/issues
 [license]: http://opensource.org/licenses/MIT
@@ -151,3 +162,4 @@ This software is published by the Financial Times under the [MIT licence][licens
 [npm]: https://www.npmjs.com/
 [origami support]: mailto:origami-support@ft.com
 [promises]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[static]: https://expressjs.com/en/starter/static-files.html

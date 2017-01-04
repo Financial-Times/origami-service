@@ -5,19 +5,19 @@ const mockery = require('mockery');
 const sinon = require('sinon');
 
 describe('lib/origami-service', () => {
-	let express;
 	let defaults;
+	let express;
 	let log;
 	let morgan;
 	let notFound;
 	let origamiService;
 
 	beforeEach(() => {
-		express = require('../mock/express.mock');
-		mockery.registerMock('express', express);
-
 		defaults = sinon.spy(require('lodash/defaults'));
 		mockery.registerMock('lodash/defaults', defaults);
+
+		express = require('../mock/express.mock');
+		mockery.registerMock('express', express);
 
 		log = require('../mock/log.mock');
 		mockery.registerMock('log', log);
@@ -128,6 +128,18 @@ describe('lib/origami-service', () => {
 
 		it('creates an Express application', () => {
 			assert.calledOnce(express);
+		});
+
+		it('sets the `env` Express setting to `options.environment`', () => {
+			assert.calledWithExactly(express.mockApp.set, 'env', options.environment);
+		});
+
+		it('sets the `json spaces` Express setting', () => {
+			assert.calledWithExactly(express.mockApp.set, 'json spaces', 4);
+		});
+
+		it('disables the `x-powered-by` Express setting', () => {
+			assert.calledWithExactly(express.mockApp.disable, 'x-powered-by');
 		});
 
 		it('creates and mounts Morgan middleware', () => {
