@@ -20,6 +20,7 @@ origamiService({
 
 		// Mount some error handling middleware
 		app.use(origamiService.middleware.notFound('The requested page does not exist'));
+		app.use(origamiService.middleware.errorHandler());
 
 	})
 

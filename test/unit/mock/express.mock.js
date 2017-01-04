@@ -22,6 +22,7 @@ express.mockStaticMiddleware = sinon.stub();
 express.static.returns(express.mockStaticMiddleware);
 
 express.mockRequest = {
+	app: mockApp,
 	headers: {},
 	path: '/',
 	query: {},

@@ -6,15 +6,20 @@ const sinon = require('sinon');
 
 describe('lib/origami-service', () => {
 	let defaults;
+	let errorHandler;
 	let express;
 	let log;
 	let morgan;
 	let notFound;
 	let origamiService;
+	let raven;
 
 	beforeEach(() => {
 		defaults = sinon.spy(require('lodash/defaults'));
 		mockery.registerMock('lodash/defaults', defaults);
+
+		errorHandler = sinon.stub();
+		mockery.registerMock('./middleware/error-handler', errorHandler);
 
 		express = require('../mock/express.mock');
 		mockery.registerMock('express', express);
@@ -27,6 +32,9 @@ describe('lib/origami-service', () => {
 
 		notFound = sinon.stub();
 		mockery.registerMock('./middleware/not-found', notFound);
+
+		raven = require('../mock/raven.mock');
+		mockery.registerMock('raven', raven);
 
 		origamiService = require('../../..');
 	});
@@ -69,6 +77,10 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(origamiService.defaults.requestLogFormat, 'combined');
 		});
 
+		it('has a `sentryDsn` property', () => {
+			assert.isNull(origamiService.defaults.sentryDsn);
+		});
+
 		it('has a `start` property', () => {
 			assert.strictEqual(origamiService.defaults.start, true);
 		});
@@ -80,6 +92,10 @@ describe('lib/origami-service', () => {
 	});
 
 	describe('.middleware', () => {
+
+		it('has an `errorHandler` property which references `lib/middleware/error-handler`', () => {
+			assert.strictEqual(origamiService.middleware.errorHandler, errorHandler);
+		});
 
 		it('has a `notFound` property which references `lib/middleware/not-found`', () => {
 			assert.strictEqual(origamiService.middleware.notFound, notFound);
@@ -98,6 +114,8 @@ describe('lib/origami-service', () => {
 			process.env.PORT = 5678;
 			process.env.REGION = 'The Moon';
 			process.env.NODE_ENV = 'production';
+			process.env.RAVEN_URL = 'env-raven-url';
+			process.env.SENTRY_DSN = 'env-sentry-dsn';
 			options = {
 				basePath: 'mock-base-path',
 				environment: 'test',
@@ -105,7 +123,8 @@ describe('lib/origami-service', () => {
 				name: 'Test App',
 				port: 1234,
 				region: 'US',
-				requestLogFormat: 'mock-log-format'
+				requestLogFormat: 'mock-log-format',
+				sentryDsn: 'mock-sentry-dsn'
 			};
 
 			returnedPromise = origamiService(options);
@@ -121,7 +140,8 @@ describe('lib/origami-service', () => {
 			assert.deepEqual(defaults.firstCall.args[2], {
 				environment: process.env.NODE_ENV,
 				port: process.env.PORT,
-				region: process.env.REGION
+				region: process.env.REGION,
+				sentryDsn: process.env.SENTRY_DSN
 			});
 			assert.strictEqual(defaults.firstCall.args[3], origamiService.defaults);
 		});
@@ -140,6 +160,17 @@ describe('lib/origami-service', () => {
 
 		it('disables the `x-powered-by` Express setting', () => {
 			assert.calledWithExactly(express.mockApp.disable, 'x-powered-by');
+		});
+
+		it('configures and installs Raven', () => {
+			assert.calledOnce(raven.config);
+			assert.calledOnce(raven.install);
+			assert.calledWithExactly(raven.config, options.sentryDsn);
+		});
+
+		it('creates and mounts Raven request handler middleware', () => {
+			assert.calledOnce(raven.requestHandler);
+			assert.calledWithExactly(express.mockApp.use, raven.mockRequestMiddleware);
 		});
 
 		it('creates and mounts Morgan middleware', () => {
@@ -283,6 +314,45 @@ describe('lib/origami-service', () => {
 			it('does not create and mount Morgan middleware', () => {
 				assert.notCalled(morgan);
 				assert.neverCalledWith(express.mockApp.use, morgan.mockMiddleware);
+			});
+
+		});
+
+		describe('when the `RAVEN_URL` environment variable is set and `SENTRY_DSN` is not', () => {
+
+			beforeEach(() => {
+				defaults.reset();
+				delete process.env.SENTRY_DSN;
+				returnedPromise = origamiService(options);
+			});
+
+			it('uses `RAVEN_URL` as a provider for the `sentryDsn` option', () => {
+				assert.deepEqual(defaults.firstCall.args[2].sentryDsn, process.env.RAVEN_URL);
+			});
+
+		});
+
+		describe('when `options.sentryDsn` is not defined', () => {
+
+			beforeEach(() => {
+				raven.config.reset();
+				raven.install.reset();
+				raven.requestHandler.reset();
+				express.mockApp.use.reset();
+				delete process.env.SENTRY_DSN;
+				delete process.env.RAVEN_URL;
+				delete options.sentryDsn;
+				returnedPromise = origamiService(options);
+			});
+
+			it('does not configure and install Raven', () => {
+				assert.notCalled(raven.config);
+				assert.notCalled(raven.install);
+			});
+
+			it('creates and mounts Raven request handler middleware', () => {
+				assert.notCalled(raven.requestHandler);
+				assert.neverCalledWith(express.mockApp.use, raven.mockRequestMiddleware);
 			});
 
 		});

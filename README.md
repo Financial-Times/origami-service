@@ -83,6 +83,7 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `port/PORT`: The port that the application should run on. Defaults to `8080`.
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
   - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`
+  - `sentryDsn/SENTRY_DSN`: The [Sentry] DSN to send errors to. If set to `null`, errors will not be sent to Sentry. Defaults to `null`. The `SENTRY_DSN` environment variable is aliased as `RAVEN_URL`
   - `start`: Whether to automatically start the application. Defaults to `true`
 
 ### `origamiService.middleware.notFound( [message] )`
@@ -101,6 +102,18 @@ By default, the error message will be set to `'Not Found'`. If you wish to speci
 
 ```js
 app.use(origamiService.middleware.notFound('This page does not exist'));
+```
+
+### `origamiService.middleware.errorHandler()`
+
+Create and return a middleware for rendering errors that occur in the application routes. The returned middleware logs errors to [Sentry] (if the `sentryDsn` option is present) and then renders an error page. It uses the `status` property of an error to decide on which error type to render.
+
+This middleware should be mounted after all of your application routes, and is useful in conjuction with `origamiService.middleware.notFound`:
+
+```js
+// routes go here
+app.use(origamiService.middleware.notFound());
+app.use(origamiService.middleware.errorHandler());
 ```
 
 ### Examples
@@ -162,4 +175,5 @@ This software is published by the Financial Times under the [MIT licence][licens
 [npm]: https://www.npmjs.com/
 [origami support]: mailto:origami-support@ft.com
 [promises]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[sentry]: https://sentry.io/
 [static]: https://expressjs.com/en/starter/static-files.html
