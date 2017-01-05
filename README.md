@@ -51,7 +51,7 @@ origamiService({
 });
 ```
 
-The Express application will have some additional properties, added by the Origami Service module:
+The Express application will have some additional properties, added by the Origami Service module. These will also be added to `app.locals` so they're available in your views.
 
   - `app.origami.options`: The defaulted [options](#options) passed into the `origamiService` call
   - `app.origami.server`: The [HTTP Server] which was returned by `app.listen`
@@ -60,6 +60,10 @@ The following [Express settings] will be set:
 
   - `json spaces`: Configured to prettify output JSON
   - `x-powered-by`: Disabled
+  - `views`: Configured to the `views` folder
+  - `view engine`: Configured to use [Handlebars]
+
+[Handlebars] will be used as a view engine with the extension `.html`. We use [Express Handlebars] for this, which means layouts and partials are supported. Add layouts and partials to `views/layouts` and `views/partials` respectively. See [the examples](#examples) for more information.
 
 Some middleware will also be mounted by default, in this order:
 
@@ -77,6 +81,7 @@ The Origami Service module can be configured with a variety of options, passed i
 The available options are as follows. Where two names are separated by a `/`, the first is the object key and the second is the environment variable:
 
   - `basePath`: The base path of the application, which paths (e.g. public files) will be relative to. Defaults to `process.cwd()`
+  - `defaultLayout`: The default layout file to use in view rendering. This should be the name of an HTML file in the `views/layouts` directory, e.g. `'main'` would map to `views/layouts/main.html`. Defaults to `false`
   - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`
   - `log`: A console object used to output non-request logs. Defaults to the global `console` object
   - `name`: The human-readable name of the application, used in logging. Defaults to `'Origami Service'`
@@ -108,13 +113,15 @@ app.use(origamiService.middleware.notFound('This page does not exist'));
 
 Create and return a middleware for rendering errors that occur in the application routes. The returned middleware logs errors to [Sentry] (if the `sentryDsn` option is present) and then renders an error page. It uses the `status` property of an error to decide on which error type to render.
 
-This middleware should be mounted after all of your application routes, and is useful in conjuction with `origamiService.middleware.notFound`:
+This middleware should be mounted after all of your application routes, and is useful in conjunction with `origamiService.middleware.notFound`:
 
 ```js
 // routes go here
 app.use(origamiService.middleware.notFound());
 app.use(origamiService.middleware.errorHandler());
 ```
+
+The error handling middleware will look for a Handlebars template in `views/error.html` and use it to render the page. If no template is found in that location then it falls back to basic HTML output. This allows you to style your error pages and use your application's default layout.
 
 ### Examples
 
@@ -138,6 +145,11 @@ You can find example implementations of Origami-compliant services in the `examp
     node examples/middleware
     ```
 
+  - **Views:** start an Origami service with partials and layouts:
+
+    ```sh
+    node examples/views
+    ```
 
 Contributing
 ------------
@@ -166,7 +178,9 @@ This software is published by the Financial Times under the [MIT licence][licens
 [#ft-origami]: https://financialtimes.slack.com/messages/ft-origami/
 [environment variables]: https://en.wikipedia.org/wiki/Environment_variable
 [express]: http://expressjs.com/
+[express handlebars]: https://github.com/ericf/express-handlebars
 [express settings]: https://expressjs.com/en/4x/api.html#app.settings.table
+[handlebars]: http://handlebarsjs.com/
 [http server]: https://nodejs.org/api/http.html#http_class_http_server
 [issues]: https://github.com/Financial-Times/origami-service/issues
 [license]: http://opensource.org/licenses/MIT

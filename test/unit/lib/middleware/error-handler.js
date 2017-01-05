@@ -50,6 +50,7 @@ describe('lib/middleware/error-handler', () => {
 				error = new Error('Oops');
 				next = sinon.spy();
 				raven.mockErrorMiddleware.yields(error);
+				express.mockResponse.render.yields(null, 'mock-html');
 				middleware(error, express.mockRequest, express.mockResponse, next);
 			});
 
@@ -71,12 +72,20 @@ describe('lib/middleware/error-handler', () => {
 				assert.calledWithExactly(express.mockResponse.status, 500);
 			});
 
-			it('responds with an HTML representation of the error', () => {
+			it('renders an error page with the expected context', () => {
+				assert.calledOnce(express.mockResponse.render);
+				assert.calledWith(express.mockResponse.render, 'error', {
+					error: {
+						status: 500,
+						message: error.message,
+						stack: error.stack
+					}
+				});
+			});
+
+			it('responds with the rendered error page', () => {
 				assert.calledOnce(express.mockResponse.send);
-				const sentData = express.mockResponse.send.firstCall.args[0];
-				assert.match(sentData, /<h1>Error 500<\/h1>/);
-				assert.match(sentData, /<p>Oops<\/p>/);
-				assert.include(sentData, error.stack);
+				assert.calledWithExactly(express.mockResponse.send, 'mock-html');
 			});
 
 			describe('when `request.app.origami.options.sentryDsn` is not defined', () => {
@@ -93,33 +102,25 @@ describe('lib/middleware/error-handler', () => {
 					assert.notCalled(raven.mockErrorMiddleware);
 				});
 
-				it('sends an error status code', () => {
-					assert.calledOnce(express.mockResponse.status);
-					assert.calledWithExactly(express.mockResponse.status, 500);
-				});
-
-				it('responds with an HTML representation of the error', () => {
-					assert.calledOnce(express.mockResponse.send);
-					const sentData = express.mockResponse.send.firstCall.args[0];
-					assert.match(sentData, /<h1>Error 500<\/h1>/);
-					assert.match(sentData, /<p>Oops<\/p>/);
-					assert.include(sentData, error.stack);
-				});
-
 			});
 
 			describe('when `request.app.origami.options.environment` is "production"', () => {
 
 				beforeEach(() => {
-					express.mockResponse.send.reset();
+					express.mockResponse.render.reset();
 					express.mockRequest.app.origami.options.environment = 'production';
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
-				it('does not include the stack in the HTML representation of the error', () => {
-					assert.calledOnce(express.mockResponse.send);
-					const sentData = express.mockResponse.send.firstCall.args[0];
-					assert.notInclude(sentData, error.stack);
+				it('does not include the stack when rendering the error', () => {
+					assert.calledOnce(express.mockResponse.render);
+					assert.calledWith(express.mockResponse.render, 'error', {
+						error: {
+							status: 500,
+							message: error.message,
+							stack: null
+						}
+					});
 				});
 
 			});
@@ -174,7 +175,7 @@ describe('lib/middleware/error-handler', () => {
 				beforeEach(() => {
 					error.status = 499;
 					log.error.reset();
-					express.mockResponse.send.reset();
+					express.mockResponse.render.reset();
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
@@ -182,9 +183,53 @@ describe('lib/middleware/error-handler', () => {
 					assert.neverCalledWith(log.error, 'Error: Oops');
 				});
 
-				it('does not include the stack in the HTML representation of the error', () => {
-					const sentData = express.mockResponse.send.firstCall.args[0];
-					assert.notInclude(sentData, error.stack);
+				it('does not include the stack when rendering the error', () => {
+					assert.calledOnce(express.mockResponse.render);
+					assert.calledWith(express.mockResponse.render, 'error', {
+						error: {
+							status: 499,
+							message: error.message,
+							stack: null
+						}
+					});
+				});
+
+			});
+
+			describe('when the error template fails to render', () => {
+				let renderError;
+
+				beforeEach(() => {
+					renderError = new Error('render-error');
+					express.mockResponse.render.yields(renderError);
+					express.mockResponse.send.reset();
+					middleware(error, express.mockRequest, express.mockResponse, next);
+				});
+
+				it('responds with a basic HTML representation of the error', () => {
+					assert.calledOnce(express.mockResponse.send);
+					const html = express.mockResponse.send.firstCall.args[0];
+					assert.match(html, /<h1>Error 500<\/h1>/);
+					assert.match(html, /<p>Oops<\/p>/);
+					assert.include(html, error.stack);
+					assert.include(html, renderError.stack);
+				});
+
+				describe('when the error stack would not normally be shown', () => {
+
+					beforeEach(() => {
+						error.status = 400;
+						express.mockResponse.send.reset();
+						middleware(error, express.mockRequest, express.mockResponse, next);
+					});
+
+					it('does not include the stack in the HTML output', () => {
+						assert.calledOnce(express.mockResponse.send);
+						const html = express.mockResponse.send.firstCall.args[0];
+						assert.notInclude(html, error.stack);
+						assert.notInclude(html, renderError.stack);
+					});
+
 				});
 
 			});

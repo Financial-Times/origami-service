@@ -17,7 +17,7 @@ origamiService({
 
 		// Create a route
 		app.get('/', (request, response) => {
-			response.send('Hello World!');
+			response.render('index');
 		});
 
 	})

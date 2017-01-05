@@ -4,10 +4,12 @@
 // full module name: @financial-times/origami-service)
 const origamiService = require('../..');
 
-// Create and run an Origami service
+// Create and run an Origami service with some
+// overridden options
 origamiService({
-	name: 'Origami Service Middleware Example',
-	basePath: __dirname
+	name: 'Origami Service Views Example',
+	basePath: __dirname,
+	defaultLayout: 'main'
 })
 
 	// When the service starts...
@@ -15,7 +17,9 @@ origamiService({
 
 		// Create a route
 		app.get('/', (request, response) => {
-			response.render('index');
+			response.render('index', {
+				message: 'This text is in the route.'
+			});
 		});
 
 		// Mount some error handling middleware

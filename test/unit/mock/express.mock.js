@@ -6,6 +6,7 @@ const express = module.exports = sinon.stub();
 const mockApp = module.exports.mockApp = {
 	disable: sinon.stub(),
 	enable: sinon.stub(),
+	engine: sinon.stub(),
 	get: sinon.stub(),
 	listen: sinon.stub(),
 	locals: {},
@@ -33,7 +34,7 @@ express.mockResponse = {
 	app: mockApp,
 	locals: {},
 	redirect: sinon.stub().returnsThis(),
-	render: sinon.stub().returnsThis(),
+	render: sinon.stub().returnsThis().yields(),
 	send: sinon.stub().returnsThis(),
 	set: sinon.stub().returnsThis(),
 	status: sinon.stub().returnsThis()

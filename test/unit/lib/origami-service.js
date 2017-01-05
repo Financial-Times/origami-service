@@ -8,6 +8,7 @@ describe('lib/origami-service', () => {
 	let defaults;
 	let errorHandler;
 	let express;
+	let expressHandlebars;
 	let log;
 	let morgan;
 	let notFound;
@@ -23,6 +24,9 @@ describe('lib/origami-service', () => {
 
 		express = require('../mock/express.mock');
 		mockery.registerMock('express', express);
+
+		expressHandlebars = require('../mock/express-handlebars.mock');
+		mockery.registerMock('express-handlebars', expressHandlebars);
 
 		log = require('../mock/log.mock');
 		mockery.registerMock('log', log);
@@ -51,6 +55,10 @@ describe('lib/origami-service', () => {
 
 		it('has a `basePath` property', () => {
 			assert.strictEqual(origamiService.defaults.basePath, process.cwd());
+		});
+
+		it('has an `defaultLayout` property', () => {
+			assert.strictEqual(origamiService.defaults.defaultLayout, false);
 		});
 
 		it('has an `environment` property', () => {
@@ -118,6 +126,7 @@ describe('lib/origami-service', () => {
 			process.env.SENTRY_DSN = 'env-sentry-dsn';
 			options = {
 				basePath: 'mock-base-path',
+				defaultLayout: 'mock-default-layout',
 				environment: 'test',
 				log: log,
 				name: 'Test App',
@@ -160,6 +169,26 @@ describe('lib/origami-service', () => {
 
 		it('disables the `x-powered-by` Express setting', () => {
 			assert.calledWithExactly(express.mockApp.disable, 'x-powered-by');
+		});
+
+		it('creates an Express Handlebars instance and adds it to Express as an engine', () => {
+			assert.calledOnce(expressHandlebars.create);
+			assert.calledWith(expressHandlebars.create, {
+				defaultLayout: options.defaultLayout,
+				extname: 'html',
+				layoutsDir: 'mock-base-path/views/layouts',
+				partialsDir: 'mock-base-path/views/partials'
+			});
+			assert.calledOnce(express.mockApp.engine);
+			assert.calledWithExactly(express.mockApp.engine, 'html', expressHandlebars.mockInstance.engine);
+		});
+
+		it('sets the `views` Express setting', () => {
+			assert.calledWithExactly(express.mockApp.set, 'views', 'mock-base-path/views');
+		});
+
+		it('sets the `view engine` Express setting', () => {
+			assert.calledWithExactly(express.mockApp.set, 'view engine', 'html');
 		});
 
 		it('configures and installs Raven', () => {
@@ -254,12 +283,19 @@ describe('lib/origami-service', () => {
 		it('stores useful application paths in `app.origami.paths`', () => {
 			assert.deepEqual(express.mockApp.origami.paths, {
 				base: 'mock-base-path',
-				public: 'mock-base-path/public'
+				public: 'mock-base-path/public',
+				views: 'mock-base-path/views',
+				layouts: 'mock-base-path/views/layouts',
+				partials: 'mock-base-path/views/partials'
 			});
 		});
 
 		it('stores the logger in `app.origami.log`', () => {
 			assert.strictEqual(express.mockApp.origami.log.info, options.log.info);
+		});
+
+		it('stores a copy of `app.origami` in `app.locals.origami`', () => {
+			assert.strictEqual(express.mockApp.origami, express.mockApp.locals.origami);
 		});
 
 		describe('.then()', () => {
