@@ -123,6 +123,18 @@ app.use(origamiService.middleware.errorHandler());
 
 The error handling middleware will look for a Handlebars template in `views/error.html` and use it to render the page. If no template is found in that location then it falls back to basic HTML output. This allows you to style your error pages and use your application's default layout.
 
+### `origamiService.middleware.getBasePath()`
+
+Calculate the base path that the application is running on and provide it for use in later middleware and templates. This middleware reads and normalises the `FT-Origami-Service-Base-Path` header (which should be set by the CDN) and adds it to:
+
+  - `request.basePath`: for later middleware to use
+  - `response.locals.basePath`: for templates to use
+
+```js
+app.use(origamiService.middleware.getBasePath());
+// routes go here
+```
+
 ### Examples
 
 You can find example implementations of Origami-compliant services in the `examples` folder of this repo:
