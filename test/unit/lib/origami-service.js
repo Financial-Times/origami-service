@@ -5,10 +5,12 @@ const mockery = require('mockery');
 const sinon = require('sinon');
 
 describe('lib/origami-service', () => {
+	let cacheControl;
 	let defaults;
 	let errorHandler;
 	let express;
 	let expressHandlebars;
+	let getBasePath;
 	let log;
 	let morgan;
 	let notFound;
@@ -16,6 +18,9 @@ describe('lib/origami-service', () => {
 	let raven;
 
 	beforeEach(() => {
+		cacheControl = sinon.stub();
+		mockery.registerMock('./middleware/cache-control', cacheControl);
+
 		defaults = sinon.spy(require('lodash/defaults'));
 		mockery.registerMock('lodash/defaults', defaults);
 
@@ -27,6 +32,9 @@ describe('lib/origami-service', () => {
 
 		expressHandlebars = require('../mock/express-handlebars.mock');
 		mockery.registerMock('express-handlebars', expressHandlebars);
+
+		getBasePath = sinon.stub();
+		mockery.registerMock('./middleware/get-base-path', getBasePath);
 
 		log = require('../mock/log.mock');
 		mockery.registerMock('log', log);
@@ -101,8 +109,16 @@ describe('lib/origami-service', () => {
 
 	describe('.middleware', () => {
 
+		it('has a `cacheControl` property which references `lib/middleware/cache-control`', () => {
+			assert.strictEqual(origamiService.middleware.cacheControl, cacheControl);
+		});
+
 		it('has an `errorHandler` property which references `lib/middleware/error-handler`', () => {
 			assert.strictEqual(origamiService.middleware.errorHandler, errorHandler);
+		});
+
+		it('has a `getBasePath` property which references `lib/middleware/get-base-path`', () => {
+			assert.strictEqual(origamiService.middleware.getBasePath, getBasePath);
 		});
 
 		it('has a `notFound` property which references `lib/middleware/not-found`', () => {

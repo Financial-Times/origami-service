@@ -135,6 +135,22 @@ app.use(origamiService.middleware.getBasePath());
 // routes go here
 ```
 
+### `origamiService.middleware.cacheControl( options )`
+
+Add a `Cache-Control` header to the response, including `stale-if-error` and `stale-while-revalidate` directives. The available options are:
+
+  - `maxAge`: The max age to set in the `Cache-Control` header. Must be a valid string that [the ms library can parse](ms-examples). Required
+  - `staleIfError`: Override the `stale-if-error` directive. Must be a valid string that [the ms library can parse](ms-examples). Defaults to the same value as `maxAge`
+  - `staleWhileRevalidate`: Override the `stale-while-revalidate` directive. Must be a valid string that [the ms library can parse](ms-examples). Defaults to the same value as `maxAge`
+
+This middleware is best used per-route, rather than at the application level:
+
+```js
+app.get('/docs', cacheControl({maxAge: '1 day'}), () => {
+    // route stuff
+});
+```
+
 ### Examples
 
 You can find example implementations of Origami-compliant services in the `examples` folder of this repo:
@@ -197,6 +213,7 @@ This software is published by the Financial Times under the [MIT licence][licens
 [issues]: https://github.com/Financial-Times/origami-service/issues
 [license]: http://opensource.org/licenses/MIT
 [morgan]: https://github.com/expressjs/morgan
+[ms-examples]: https://github.com/zeit/ms#examples
 [node.js]: https://nodejs.org/
 [npm]: https://www.npmjs.com/
 [origami support]: mailto:origami-support@ft.com

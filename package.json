@@ -28,6 +28,7 @@
     "http-errors": "^1.5.1",
     "lodash": "^4.17.2",
     "morgan": "^1.7.0",
+    "ms": "^0.7.2",
     "raven": "^1.1.1"
   },
   "devDependencies": {
