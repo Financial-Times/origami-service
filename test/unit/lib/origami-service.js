@@ -2,30 +2,23 @@
 
 const assert = require('proclaim');
 const mockery = require('mockery');
+const path = require('path');
 const sinon = require('sinon');
 
 describe('lib/origami-service', () => {
-	let cacheControl;
 	let defaults;
-	let errorHandler;
 	let express;
 	let expressHandlebars;
-	let getBasePath;
 	let log;
 	let morgan;
-	let notFound;
 	let origamiService;
 	let raven;
+	let requireAll;
+	let varname;
 
 	beforeEach(() => {
-		cacheControl = sinon.stub();
-		mockery.registerMock('./middleware/cache-control', cacheControl);
-
 		defaults = sinon.spy(require('lodash/defaults'));
 		mockery.registerMock('lodash/defaults', defaults);
-
-		errorHandler = sinon.stub();
-		mockery.registerMock('./middleware/error-handler', errorHandler);
 
 		express = require('../mock/express.mock');
 		mockery.registerMock('express', express);
@@ -33,20 +26,20 @@ describe('lib/origami-service', () => {
 		expressHandlebars = require('../mock/express-handlebars.mock');
 		mockery.registerMock('express-handlebars', expressHandlebars);
 
-		getBasePath = sinon.stub();
-		mockery.registerMock('./middleware/get-base-path', getBasePath);
-
 		log = require('../mock/log.mock');
 		mockery.registerMock('log', log);
 
 		morgan = require('../mock/morgan.mock');
 		mockery.registerMock('morgan', morgan);
 
-		notFound = sinon.stub();
-		mockery.registerMock('./middleware/not-found', notFound);
-
 		raven = require('../mock/raven.mock');
 		mockery.registerMock('raven', raven);
+
+		requireAll = require('../mock/require-all.mock');
+		mockery.registerMock('require-all', requireAll);
+
+		varname = require('../mock/varname.mock');
+		mockery.registerMock('varname', varname);
 
 		origamiService = require('../../..');
 	});
@@ -103,28 +96,15 @@ describe('lib/origami-service', () => {
 
 	});
 
-	it('has a `middleware` property', () => {
-		assert.isObject(origamiService.middleware);
+	it('calls `requireAll` with the middleware path and a variable name converter', () => {
+		assert.calledOnce(requireAll);
+		assert.isObject(requireAll.firstCall.args[0]);
+		assert.strictEqual(requireAll.firstCall.args[0].dirname, path.resolve(`${__dirname}/../../../lib/middleware`));
+		assert.strictEqual(requireAll.firstCall.args[0].map, varname.camelback);
 	});
 
-	describe('.middleware', () => {
-
-		it('has a `cacheControl` property which references `lib/middleware/cache-control`', () => {
-			assert.strictEqual(origamiService.middleware.cacheControl, cacheControl);
-		});
-
-		it('has an `errorHandler` property which references `lib/middleware/error-handler`', () => {
-			assert.strictEqual(origamiService.middleware.errorHandler, errorHandler);
-		});
-
-		it('has a `getBasePath` property which references `lib/middleware/get-base-path`', () => {
-			assert.strictEqual(origamiService.middleware.getBasePath, getBasePath);
-		});
-
-		it('has a `notFound` property which references `lib/middleware/not-found`', () => {
-			assert.strictEqual(origamiService.middleware.notFound, notFound);
-		});
-
+	it('has a `middleware` property set to the return value of the `requireAll`', () => {
+		assert.strictEqual(origamiService.middleware, requireAll.mockModules);
 	});
 
 	describe('origamiService(options)', () => {

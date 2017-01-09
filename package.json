@@ -29,7 +29,9 @@
     "lodash": "^4.17.2",
     "morgan": "^1.7.0",
     "ms": "^0.7.2",
-    "raven": "^1.1.1"
+    "raven": "^1.1.1",
+    "require-all": "^2.1.0",
+    "varname": "^2.0.3"
   },
   "devDependencies": {
     "eslint": "^2.13.1",
