@@ -90,10 +90,6 @@ describe('lib/origami-service', () => {
 			assert.isNull(origamiService.defaults.sentryDsn);
 		});
 
-		it('has a `start` property', () => {
-			assert.strictEqual(origamiService.defaults.start, true);
-		});
-
 	});
 
 	it('calls `requireAll` with the middleware path and a variable name converter', () => {
@@ -108,8 +104,8 @@ describe('lib/origami-service', () => {
 	});
 
 	describe('origamiService(options)', () => {
+		let app;
 		let options;
-		let returnedPromise;
 
 		beforeEach(() => {
 
@@ -132,11 +128,7 @@ describe('lib/origami-service', () => {
 				sentryDsn: 'mock-sentry-dsn'
 			};
 
-			returnedPromise = origamiService(options);
-		});
-
-		it('returns a promise', () => {
-			assert.instanceOf(returnedPromise, Promise);
+			app = origamiService(options);
 		});
 
 		it('defaults the passed in options', () => {
@@ -207,27 +199,27 @@ describe('lib/origami-service', () => {
 		});
 
 		describe('Morgan `skip` option function', () => {
-			let returnedValue;
+			let app;
 			let skip;
 
 			beforeEach(() => {
 				skip = morgan.firstCall.args[1].skip;
-				returnedValue = skip(express.mockRequest);
+				app = skip(express.mockRequest);
 			});
 
 			it('returns `false`', () => {
-				assert.isFalse(returnedValue);
+				assert.isFalse(app);
 			});
 
 			describe('when `request.path` is `"/favicon.ico"`', () => {
 
 				beforeEach(() => {
 					express.mockRequest.path = '/favicon.ico';
-					returnedValue = skip(express.mockRequest);
+					app = skip(express.mockRequest);
 				});
 
 				it('returns `true`', () => {
-					assert.isTrue(returnedValue);
+					assert.isTrue(app);
 				});
 
 			});
@@ -236,11 +228,11 @@ describe('lib/origami-service', () => {
 
 				beforeEach(() => {
 					express.mockRequest.path = '/foo/bar/__health';
-					returnedValue = skip(express.mockRequest);
+					app = skip(express.mockRequest);
 				});
 
 				it('returns `true`', () => {
-					assert.isTrue(returnedValue);
+					assert.isTrue(app);
 				});
 
 			});
@@ -249,11 +241,11 @@ describe('lib/origami-service', () => {
 
 				beforeEach(() => {
 					express.mockRequest.path = '/__origami/foo/bar/';
-					returnedValue = skip(express.mockRequest);
+					app = skip(express.mockRequest);
 				});
 
 				it('returns `false`', () => {
-					assert.isFalse(returnedValue);
+					assert.isFalse(app);
 				});
 
 			});
@@ -294,27 +286,8 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(express.mockApp.origami, express.mockApp.locals.origami);
 		});
 
-		describe('.then()', () => {
-			let app;
-
-			beforeEach(() => {
-				return returnedPromise.then(value => {
-					app = value;
-				});
-			});
-
-			it('resolves with the created Express application', () => {
-				assert.strictEqual(app, express.mockApp);
-			});
-
-			it('stores the created server in `app.origami.server`', () => {
-				assert.strictEqual(app.origami.server, express.mockServer);
-			});
-
-			it('logs that the application has started', () => {
-				assert.calledWith(log.info, 'Test App started (env=test port=1234)');
-			});
-
+		it('returns the created Express application', () => {
+			assert.strictEqual(app, express.mockApp);
 		});
 
 		describe('when `options.environment` is set to "production"', () => {
@@ -322,7 +295,7 @@ describe('lib/origami-service', () => {
 			beforeEach(() => {
 				express.static.reset();
 				options.environment = 'production';
-				returnedPromise = origamiService(options);
+				app = origamiService(options);
 			});
 
 			it('creates and mounts Express static middleware with a week long max-age', () => {
@@ -340,7 +313,7 @@ describe('lib/origami-service', () => {
 				morgan.reset();
 				express.mockApp.use.reset();
 				options.requestLogFormat = null;
-				returnedPromise = origamiService(options);
+				app = origamiService(options);
 			});
 
 			it('does not create and mount Morgan middleware', () => {
@@ -355,7 +328,7 @@ describe('lib/origami-service', () => {
 			beforeEach(() => {
 				defaults.reset();
 				delete process.env.SENTRY_DSN;
-				returnedPromise = origamiService(options);
+				app = origamiService(options);
 			});
 
 			it('uses `RAVEN_URL` as a provider for the `sentryDsn` option', () => {
@@ -374,7 +347,7 @@ describe('lib/origami-service', () => {
 				delete process.env.SENTRY_DSN;
 				delete process.env.RAVEN_URL;
 				delete options.sentryDsn;
-				returnedPromise = origamiService(options);
+				app = origamiService(options);
 			});
 
 			it('does not configure and install Raven', () => {
@@ -389,69 +362,80 @@ describe('lib/origami-service', () => {
 
 		});
 
-		describe('when `options.start` is set to `false`', () => {
+		describe('.listen()', () => {
+			let returnedPromise;
 
 			beforeEach(() => {
-				log.info.reset();
-				express.mockApp.listen.reset();
-				options.start = false;
-				returnedPromise = origamiService(options);
+				returnedPromise = app.listen();
+			});
+
+			it('returns a promise', () => {
+				assert.instanceOf(returnedPromise, Promise);
+			});
+
+			it('stores the original `app.listen` as `app._originalListen`', () => {
+				assert.isFunction(express.mockApp._originalListen);
+			});
+
+			it('Calls the original `app.listen` with `options.port`', () => {
+				assert.calledOnce(express.mockApp._originalListen);
+				assert.calledWith(express.mockApp._originalListen, options.port);
 			});
 
 			describe('.then()', () => {
-				let app;
+				let resolvedValue;
 
 				beforeEach(() => {
 					return returnedPromise.then(value => {
-						app = value;
+						resolvedValue = value;
 					});
 				});
 
-				it('does not start the Express application', () => {
-					assert.notCalled(express.mockApp.listen);
+				it('resolves with the Express application', () => {
+					assert.strictEqual(resolvedValue, app);
 				});
 
-				it('resolves with the created Express application', () => {
-					assert.strictEqual(app, express.mockApp);
+				it('stores the created server in `app.origami.server`', () => {
+					assert.strictEqual(app.origami.server, express.mockServer);
 				});
 
-				it('does not log that the application has started', () => {
-					assert.neverCalledWith(log.info, 'Test App started (env=test port=1234)');
+				it('logs that the application has started', () => {
+					assert.calledWith(log.info, 'Test App started (env=test port=1234)');
 				});
 
 			});
 
-		});
-
-		describe('when the Express application errors on startup', () => {
-			let expressError;
-
-			beforeEach(() => {
-				options.log.info.reset();
-				options.log.error.reset();
-				expressError = new Error('Express failed to start');
-				express.mockApp.listen.yieldsAsync(expressError);
-			});
-
-			describe('.catch()', () => {
-				let caughtError;
+			describe('when the Express application errors on startup', () => {
+				let expressError;
 
 				beforeEach(() => {
-					return origamiService(options).catch(error => {
-						caughtError = error;
+					options.log.info.reset();
+					options.log.error.reset();
+					expressError = new Error('Express failed to start');
+					express.mockApp._originalListen.yieldsAsync(expressError);
+				});
+
+				describe('.catch()', () => {
+					let caughtError;
+
+					beforeEach(() => {
+						return app.listen().catch(error => {
+							caughtError = error;
+						});
 					});
-				});
 
-				it('rejects with the Express error', () => {
-					assert.strictEqual(caughtError, expressError);
-				});
+					it('rejects with the Express error', () => {
+						assert.strictEqual(caughtError, expressError);
+					});
 
-				it('does not log that the application has started', () => {
-					assert.neverCalledWith(log.info, 'Test App started (env=test port=1234)');
-				});
+					it('does not log that the application has started', () => {
+						assert.neverCalledWith(log.info, 'Test App started (env=test port=1234)');
+					});
 
-				it('logs that the application has errored', () => {
-					assert.calledWith(log.error, `Test App startup error (${expressError.message})`);
+					it('logs that the application has errored', () => {
+						assert.calledWith(log.error, `Test App startup error (${expressError.message})`);
+					});
+
 				});
 
 			});

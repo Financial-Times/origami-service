@@ -35,20 +35,21 @@ const origamiService = require('@financial-times/origami-service');
 
 ### `origamiService( [options] )`
 
-This function returns a promise which resolves with a new [Express] application. The Express application will be started automatically, and the returned promise will reject if there's an error in startup.
-
-You can configure the created service with [an options object](#options) if you need to override any defaults.
+This function returns a new [Express] application preconfigured to run as an Origami service. You can configure the created service with [an options object](#options) if you need to override any defaults.
 
 ```js
-origamiService({
+const app = origamiService({
     port: 1234
-})
-.then(app => {
-    // do something with the app
-})
-.catch(error => {
-    // handle the error
 });
+```
+
+The application's `listen` function has a different signature to Express, it's wrapped in a promise and uses the `port` option from the constructor:
+
+```js
+const app = origamiService({
+    port: 1234
+});
+app.listen(); // runs on port 1234 and returns a promise
 ```
 
 The Express application will have some additional properties, added by the Origami Service module. These will also be added to `app.locals` so they're available in your views.
@@ -89,7 +90,6 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
   - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`
   - `sentryDsn/SENTRY_DSN`: The [Sentry] DSN to send errors to. If set to `null`, errors will not be sent to Sentry. Defaults to `null`. The `SENTRY_DSN` environment variable is aliased as `RAVEN_URL`
-  - `start`: Whether to automatically start the application. Defaults to `true`
 
 ### `origamiService.middleware.notFound( [message] )`
 
