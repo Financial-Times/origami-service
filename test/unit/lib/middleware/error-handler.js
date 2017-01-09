@@ -75,6 +75,7 @@ describe('lib/middleware/error-handler', () => {
 			it('renders an error page with the expected context', () => {
 				assert.calledOnce(express.mockResponse.render);
 				assert.calledWith(express.mockResponse.render, 'error', {
+					title: 'Error 500',
 					error: {
 						status: 500,
 						message: error.message,
@@ -115,6 +116,7 @@ describe('lib/middleware/error-handler', () => {
 				it('does not include the stack when rendering the error', () => {
 					assert.calledOnce(express.mockResponse.render);
 					assert.calledWith(express.mockResponse.render, 'error', {
+						title: 'Error 500',
 						error: {
 							status: 500,
 							message: error.message,
@@ -186,6 +188,7 @@ describe('lib/middleware/error-handler', () => {
 				it('does not include the stack when rendering the error', () => {
 					assert.calledOnce(express.mockResponse.render);
 					assert.calledWith(express.mockResponse.render, 'error', {
+						title: 'Error 499',
 						error: {
 							status: 499,
 							message: error.message,
