@@ -10,6 +10,7 @@ Provides an extended [Express], as well as useful tools for building consistent 
     - [Options](#options)
     - [Examples](#examples)
   - [Contributing](#contributing)
+  - [Publishing](#publishing)
   - [Contact](#contact)
   - [Licence](#licence)
 
@@ -203,6 +204,11 @@ This module has a full suite of unit tests, and is verified with ESLint. You can
 make verify  # verify JavaScript code with ESLint
 make test    # run the unit tests and check coverage
 ```
+
+Publishing
+----------
+
+New versions of the module are published automatically by CI when a new tag is created matching the pattern `/v.*/`.
 
 
 Contact
