@@ -294,6 +294,19 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(app, express.mockApp);
 		});
 
+		describe('when `options.about.schemaVersion` is not set', () => {
+
+			beforeEach(() => {
+				delete options.about.schemaVersion;
+				app = origamiService(options);
+			});
+
+			it('sets the schema version to 1', () => {
+				assert.strictEqual(app.origami.options.about.schemaVersion, 1);
+			});
+
+		});
+
 		describe('when `options.about.name` is not set', () => {
 
 			beforeEach(() => {
