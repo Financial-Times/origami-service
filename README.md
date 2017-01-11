@@ -81,11 +81,13 @@ The Origami Service module can be configured with a variety of options, passed i
 
 The available options are as follows. Where two names are separated by a `/`, the first is the object key and the second is the environment variable:
 
+  - `about`: About information to populate the `/__about` endpoint with. This should be an object which conforms to the FT's [about/runbook standard][about-standard]. This defaults the `name/summary` properties to `name/description` from your `package.json` file if they're not set. This option gets passed on to [Express Web Service]
   - `basePath`: The base path of the application, which paths (e.g. public files) will be relative to. Defaults to `process.cwd()`
   - `defaultLayout`: The default layout file to use in view rendering. This should be the name of an HTML file in the `views/layouts` directory, e.g. `'main'` would map to `views/layouts/main.html`. Defaults to `false`
   - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`
+  - `goodToGoTest`: A function to use in calculating whether the application is good to go. See [Express Web Service] for more information
+  - `healthCheck`: A function to use in calculating how healthy the application is. See [Express Web Service] for more information
   - `log`: A console object used to output non-request logs. Defaults to the global `console` object
-  - `name`: The human-readable name of the application, used in logging. Defaults to `'Origami Service'`
   - `port/PORT`: The port that the application should run on. Defaults to `8080`.
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
   - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`
@@ -216,10 +218,12 @@ This software is published by the Financial Times under the [MIT licence][licens
 
 
 [#ft-origami]: https://financialtimes.slack.com/messages/ft-origami/
+[about-standard]: https://docs.google.com/document/d/1B80a0nAI8L1cuIlSEai4Zuztq7Lef0ytxJYNFCjG7Ko/edit
 [environment variables]: https://en.wikipedia.org/wiki/Environment_variable
 [express]: http://expressjs.com/
 [express handlebars]: https://github.com/ericf/express-handlebars
 [express settings]: https://expressjs.com/en/4x/api.html#app.settings.table
+[express web service]: https://github.com/Financial-Times/express-web-service
 [handlebars]: http://handlebarsjs.com/
 [http server]: https://nodejs.org/api/http.html#http_class_http_server
 [issues]: https://github.com/Financial-Times/origami-service/issues

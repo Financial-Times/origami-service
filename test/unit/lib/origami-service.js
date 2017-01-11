@@ -9,7 +9,9 @@ describe('lib/origami-service', () => {
 	let defaults;
 	let express;
 	let expressHandlebars;
+	let expressWebService;
 	let log;
+	let manifest;
 	let morgan;
 	let origamiService;
 	let raven;
@@ -26,8 +28,17 @@ describe('lib/origami-service', () => {
 		expressHandlebars = require('../mock/express-handlebars.mock');
 		mockery.registerMock('express-handlebars', expressHandlebars);
 
+		expressWebService = require('../mock/express-web-service.mock');
+		mockery.registerMock('@financial-times/express-web-service', expressWebService);
+
 		log = require('../mock/log.mock');
 		mockery.registerMock('log', log);
+
+		manifest = {
+			name: 'mock-manifest-name',
+			description: 'mock-manifest-description'
+		};
+		mockery.registerMock('mock-base-path/package.json', manifest);
 
 		morgan = require('../mock/morgan.mock');
 		mockery.registerMock('morgan', morgan);
@@ -54,6 +65,10 @@ describe('lib/origami-service', () => {
 
 	describe('.defaults', () => {
 
+		it('has an `about` property', () => {
+			assert.deepEqual(origamiService.defaults.about, {});
+		});
+
 		it('has a `basePath` property', () => {
 			assert.strictEqual(origamiService.defaults.basePath, process.cwd());
 		});
@@ -68,10 +83,6 @@ describe('lib/origami-service', () => {
 
 		it('has a `log` property', () => {
 			assert.strictEqual(origamiService.defaults.log, console);
-		});
-
-		it('has a `name` property', () => {
-			assert.strictEqual(origamiService.defaults.name, 'Origami Service');
 		});
 
 		it('has a `port` property', () => {
@@ -117,11 +128,17 @@ describe('lib/origami-service', () => {
 			process.env.RAVEN_URL = 'env-raven-url';
 			process.env.SENTRY_DSN = 'env-sentry-dsn';
 			options = {
+				about: {
+					schemaVersion: 1,
+					name: 'Test App',
+					summary: 'A test application.'
+				},
 				basePath: 'mock-base-path',
 				defaultLayout: 'mock-default-layout',
 				environment: 'test',
+				goodToGoTest: sinon.spy(),
+				healthCheck: sinon.spy(),
 				log: log,
-				name: 'Test App',
 				port: 1234,
 				region: 'US',
 				requestLogFormat: 'mock-log-format',
@@ -190,6 +207,18 @@ describe('lib/origami-service', () => {
 			assert.calledWithExactly(express.mockApp.use, raven.mockRequestMiddleware);
 		});
 
+		it('creates and mounts Express Web Service middleware', () => {
+			assert.calledOnce(expressWebService);
+			assert.isObject(expressWebService.firstCall.args[0]);
+			assert.deepEqual(expressWebService.firstCall.args[0], {
+				manifestPath: 'mock-base-path/package.json',
+				about: options.about,
+				goodToGoTest: options.goodToGoTest,
+				healthCheck: options.healthCheck
+			});
+			assert.calledWithExactly(express.mockApp.use, expressWebService.mockMiddleware);
+		});
+
 		it('creates and mounts Morgan middleware', () => {
 			assert.calledOnce(morgan);
 			assert.calledWith(morgan, 'mock-log-format');
@@ -224,32 +253,6 @@ describe('lib/origami-service', () => {
 
 			});
 
-			describe('when the last part of `request.path` begins with a double underscore', () => {
-
-				beforeEach(() => {
-					express.mockRequest.path = '/foo/bar/__health';
-					app = skip(express.mockRequest);
-				});
-
-				it('returns `true`', () => {
-					assert.isTrue(app);
-				});
-
-			});
-
-			describe('when the first part of `request.path` begins with a double underscore', () => {
-
-				beforeEach(() => {
-					express.mockRequest.path = '/__origami/foo/bar/';
-					app = skip(express.mockRequest);
-				});
-
-				it('returns `false`', () => {
-					assert.isFalse(app);
-				});
-
-			});
-
 		});
 
 		it('creates and mounts Express static middleware', () => {
@@ -271,6 +274,7 @@ describe('lib/origami-service', () => {
 		it('stores useful application paths in `app.origami.paths`', () => {
 			assert.deepEqual(express.mockApp.origami.paths, {
 				base: 'mock-base-path',
+				manifest: 'mock-base-path/package.json',
 				public: 'mock-base-path/public',
 				views: 'mock-base-path/views',
 				layouts: 'mock-base-path/views/layouts',
@@ -288,6 +292,60 @@ describe('lib/origami-service', () => {
 
 		it('returns the created Express application', () => {
 			assert.strictEqual(app, express.mockApp);
+		});
+
+		describe('when `options.about.name` is not set', () => {
+
+			beforeEach(() => {
+				delete options.about.name;
+				app = origamiService(options);
+			});
+
+			it('sets the name to the manifest name', () => {
+				assert.strictEqual(app.origami.options.about.name, manifest.name);
+			});
+
+		});
+
+		describe('when `options.about.name` and `manifest.name` are not set', () => {
+
+			beforeEach(() => {
+				delete options.about.name;
+				delete manifest.name;
+				app = origamiService(options);
+			});
+
+			it('sets the name to a default', () => {
+				assert.strictEqual(app.origami.options.about.name, 'Origami Service');
+			});
+
+		});
+
+		describe('when `options.about.summary` is not set', () => {
+
+			beforeEach(() => {
+				delete options.about.summary;
+				app = origamiService(options);
+			});
+
+			it('sets the summary to the manifest description', () => {
+				assert.strictEqual(app.origami.options.about.summary, manifest.description);
+			});
+
+		});
+
+		describe('when `options.about.summary` and `manifest.description` are not set', () => {
+
+			beforeEach(() => {
+				delete options.about.summary;
+				delete manifest.description;
+				app = origamiService(options);
+			});
+
+			it('sets the summary to a default', () => {
+				assert.strictEqual(app.origami.options.about.summary, 'An Origami web service.');
+			});
+
 		});
 
 		describe('when `options.environment` is set to "production"', () => {

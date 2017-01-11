@@ -7,7 +7,9 @@ const origamiService = require('../..');
 // Create and run an Origami service with some
 // overridden options
 const app = origamiService({
-	name: 'Origami Service Options Example',
+	about: {
+		name: 'Origami Service Options Example'
+	},
 	basePath: __dirname,
 	port: 8765
 });

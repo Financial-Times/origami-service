@@ -6,7 +6,9 @@ const origamiService = require('../..');
 
 // Create and run an Origami service
 const app = origamiService({
-	name: 'Origami Service Basic Example',
+	about: {
+		name: 'Origami Service Basic Example'
+	},
 	basePath: __dirname
 });
 
