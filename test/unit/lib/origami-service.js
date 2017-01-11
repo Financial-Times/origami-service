@@ -131,7 +131,7 @@ describe('lib/origami-service', () => {
 				about: {
 					schemaVersion: 1,
 					name: 'Test App',
-					summary: 'A test application.'
+					purpose: 'A test application.'
 				},
 				basePath: 'mock-base-path',
 				defaultLayout: 'mock-default-layout',
@@ -321,29 +321,29 @@ describe('lib/origami-service', () => {
 
 		});
 
-		describe('when `options.about.summary` is not set', () => {
+		describe('when `options.about.purpose` is not set', () => {
 
 			beforeEach(() => {
-				delete options.about.summary;
+				delete options.about.purpose;
 				app = origamiService(options);
 			});
 
-			it('sets the summary to the manifest description', () => {
-				assert.strictEqual(app.origami.options.about.summary, manifest.description);
+			it('sets the purpose to the manifest description', () => {
+				assert.strictEqual(app.origami.options.about.purpose, manifest.description);
 			});
 
 		});
 
-		describe('when `options.about.summary` and `manifest.description` are not set', () => {
+		describe('when `options.about.purpose` and `manifest.description` are not set', () => {
 
 			beforeEach(() => {
-				delete options.about.summary;
+				delete options.about.purpose;
 				delete manifest.description;
 				app = origamiService(options);
 			});
 
-			it('sets the summary to a default', () => {
-				assert.strictEqual(app.origami.options.about.summary, 'An Origami web service.');
+			it('sets the purpose to a default', () => {
+				assert.strictEqual(app.origami.options.about.purpose, 'An Origami web service.');
 			});
 
 		});
