@@ -68,6 +68,7 @@ The following [Express settings] will be set:
 
 Some middleware will also be mounted by default, in this order:
 
+  - [Express Web Service]: To provide `/__about`, `/__health`, and `/__gtg` endpoints
   - [Morgan]: To log requests
   - [Static]: To serve files in the application's `public` folder
 
