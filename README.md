@@ -4,6 +4,14 @@ Origami Service
 
 Provides an extended [Express], as well as useful tools for building consistent Origami services.
 
+[![NPM version](https://img.shields.io/npm/v/@financial-times/origami-service.svg)](https://www.npmjs.com/package/@financial-times/origami-service)
+[![Build status](https://img.shields.io/circleci/project/Financial-Times/origami-service.svg)](https://circleci.com/gh/Financial-Times/origami-service)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)][license]
+
+
+Table Of Contents
+-----------------
+
   - [Usage](#usage)
     - [Requirements](#requirements)
     - [API Documentation](#api-documentation)
