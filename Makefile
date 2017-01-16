@@ -18,7 +18,7 @@ verify-coverage:
 # Test tasks
 # ----------
 
-test: test-unit-coverage verify-coverage
+test: test-unit-coverage verify-coverage test-examples
 	@$(DONE)
 
 test-unit:
@@ -27,4 +27,8 @@ test-unit:
 
 test-unit-coverage:
 	@NODE_ENV=test nyc --reporter=text --reporter=html node_modules/.bin/_mocha test/unit --recursive
+	@$(DONE)
+
+test-examples:
+	@NODE_ENV=test mocha test/example --recursive --timeout 10000 --slow 5000
 	@$(DONE)
