@@ -303,6 +303,10 @@ describe('lib/origami-service', () => {
 			assert.calledWithExactly(express.mockApp.use, express.mockStaticMiddleware);
 		});
 
+		it('logs that the application has been configured', () => {
+			assert.calledWith(log.info, 'Test App configured (graphite=true logging=true sentry=true)');
+		});
+
 		it('stores additional data in the `app.origami` object', () => {
 			assert.isObject(express.mockApp.origami);
 		});
