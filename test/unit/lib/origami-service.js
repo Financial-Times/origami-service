@@ -13,6 +13,7 @@ describe('lib/origami-service', () => {
 	let log;
 	let manifest;
 	let morgan;
+	let nextMetrics;
 	let origamiService;
 	let raven;
 	let requireAll;
@@ -42,6 +43,9 @@ describe('lib/origami-service', () => {
 
 		morgan = require('../mock/morgan.mock');
 		mockery.registerMock('morgan', morgan);
+
+		nextMetrics = require('../mock/next-metrics.mock');
+		mockery.registerMock('next-metrics', nextMetrics);
 
 		raven = require('../mock/raven.mock');
 		mockery.registerMock('raven', raven);
@@ -79,6 +83,10 @@ describe('lib/origami-service', () => {
 
 		it('has an `environment` property', () => {
 			assert.strictEqual(origamiService.defaults.environment, 'development');
+		});
+
+		it('has a `graphiteApiKey` property', () => {
+			assert.isNull(origamiService.defaults.graphiteApiKey);
 		});
 
 		it('has a `log` property', () => {
@@ -122,21 +130,25 @@ describe('lib/origami-service', () => {
 
 			// Define options in the environment and
 			// as an object (which takes priority)
-			process.env.PORT = 5678;
-			process.env.REGION = 'The Moon';
+			process.env.FT_GRAPHITE_APIKEY = 'env-ft-graphite-apikey';
+			process.env.GRAPHITE_API_KEY = 'env-graphite-api-key';
 			process.env.NODE_ENV = 'production';
+			process.env.PORT = 5678;
 			process.env.RAVEN_URL = 'env-raven-url';
+			process.env.REGION = 'The Moon';
 			process.env.SENTRY_DSN = 'env-sentry-dsn';
 			options = {
 				about: {
 					schemaVersion: 1,
 					name: 'Test App',
-					purpose: 'A test application.'
+					purpose: 'A test application.',
+					systemCode: 'test-app'
 				},
 				basePath: 'mock-base-path',
 				defaultLayout: 'mock-default-layout',
 				environment: 'test',
 				goodToGoTest: sinon.spy(),
+				graphiteApiKey: 'mock-graphite-api-key',
 				healthCheck: sinon.spy(),
 				log: log,
 				port: 1234,
@@ -153,6 +165,7 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(defaults.firstCall.args[1], options);
 			assert.deepEqual(defaults.firstCall.args[2], {
 				environment: process.env.NODE_ENV,
+				graphiteApiKey: process.env.GRAPHITE_API_KEY,
 				port: process.env.PORT,
 				region: process.env.REGION,
 				sentryDsn: process.env.SENTRY_DSN
@@ -194,6 +207,33 @@ describe('lib/origami-service', () => {
 
 		it('sets the `view engine` Express setting', () => {
 			assert.calledWithExactly(express.mockApp.set, 'view engine', 'html');
+		});
+
+		it('configures and initialises Next Metrics', () => {
+			assert.calledOnce(nextMetrics.Metrics);
+			assert.calledOnce(nextMetrics.mockInstance.init);
+			assert.calledWith(nextMetrics.mockInstance.init, {
+				app: options.about.systemCode,
+				flushEvery: 40000,
+				ftApiKey: options.graphiteApiKey,
+				hostedApiKey: false
+			});
+		});
+
+		it('mounts a middleware which instruments the request and response with Next Metrics', () => {
+			const middleware = app.use.firstCall.args[0];
+			const next = sinon.spy();
+			assert.notCalled(nextMetrics.mockInstance.instrument);
+			middleware(express.mockRequest, express.mockResponse, next);
+			assert.calledTwice(nextMetrics.mockInstance.instrument);
+			assert.calledWith(nextMetrics.mockInstance.instrument, express.mockRequest, {
+				as: 'express.http.req'
+			});
+			assert.calledWith(nextMetrics.mockInstance.instrument, express.mockResponse, {
+				as: 'express.http.res'
+			});
+			assert.calledOnce(next);
+			assert.calledWithExactly(next);
 		});
 
 		it('configures and installs Raven', () => {
@@ -286,6 +326,10 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(express.mockApp.origami.log.info, options.log.info);
 		});
 
+		it('stores the Next Metrics instance in `app.origami.metrics`', () => {
+			assert.strictEqual(express.mockApp.origami.metrics, nextMetrics.mockInstance);
+		});
+
 		it('stores a copy of `app.origami` in `app.locals.origami`', () => {
 			assert.strictEqual(express.mockApp.origami, express.mockApp.locals.origami);
 		});
@@ -361,6 +405,21 @@ describe('lib/origami-service', () => {
 
 		});
 
+		describe('when `options.about.systemCode` is not set', () => {
+
+			beforeEach(() => {
+				delete options.about.systemCode;
+				nextMetrics.mockInstance.init.reset();
+				app = origamiService(options);
+			});
+
+			it('uses `options.about.name` as the app name in Next Metrics', () => {
+				assert.calledOnce(nextMetrics.mockInstance.init);
+				assert.strictEqual(nextMetrics.mockInstance.init.firstCall.args[0].app, options.about.name);
+			});
+
+		});
+
 		describe('when `options.environment` is set to "production"', () => {
 
 			beforeEach(() => {
@@ -374,6 +433,22 @@ describe('lib/origami-service', () => {
 				assert.calledWithExactly(express.static, 'mock-base-path/public', {
 					maxAge: 604800000
 				});
+			});
+
+		});
+
+		describe('when `options.graphiteApiKey` is set to `null`', () => {
+
+			beforeEach(() => {
+				nextMetrics.Metrics.reset();
+				nextMetrics.mockInstance.init.reset();
+				options.graphiteApiKey = null;
+				app = origamiService(options);
+			});
+
+			it('does not create or initialise Next Metrics', () => {
+				assert.notCalled(nextMetrics.Metrics);
+				assert.notCalled(nextMetrics.mockInstance.init);
 			});
 
 		});
@@ -404,6 +479,20 @@ describe('lib/origami-service', () => {
 
 			it('uses `RAVEN_URL` as a provider for the `sentryDsn` option', () => {
 				assert.deepEqual(defaults.firstCall.args[2].sentryDsn, process.env.RAVEN_URL);
+			});
+
+		});
+
+		describe('when the `FT_GRAPHITE_APIKEY` environment variable is set and `GRAPHITE_API_KEY` is not', () => {
+
+			beforeEach(() => {
+				defaults.reset();
+				delete process.env.GRAPHITE_API_KEY;
+				app = origamiService(options);
+			});
+
+			it('uses `FT_GRAPHITE_APIKEY` as a provider for the `graphiteApiKey` option', () => {
+				assert.deepEqual(defaults.firstCall.args[2].graphiteApiKey, process.env.FT_GRAPHITE_APIKEY);
 			});
 
 		});

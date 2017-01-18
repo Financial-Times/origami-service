@@ -78,6 +78,7 @@ The following [Express settings] will be set:
 Some middleware will also be mounted by default, in this order:
 
   - [Express Web Service]: To provide `/__about`, `/__health`, and `/__gtg` endpoints
+  - [Next Metrics]: To send request/response data to Graphite
   - [Morgan]: To log requests
   - [Static]: To serve files in the application's `public` folder
 
@@ -96,6 +97,7 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `defaultLayout`: The default layout file to use in view rendering. This should be the name of an HTML file in the `views/layouts` directory, e.g. `'main'` would map to `views/layouts/main.html`. Defaults to `false`
   - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`
   - `goodToGoTest`: A function to use in calculating whether the application is good to go. See [Express Web Service] for more information
+  - `graphiteApiKey/GRAPHITE_API_KEY`: The API key to use when accessing the FT's internal Graphite instance. If set to `null`, metrics will not be reported. Defaults to `null`. The `GRAPHITE_API_KEY` environment variable is aliased as `FT_GRAPHITE_APIKEY`
   - `healthCheck`: A function to use in calculating how healthy the application is. See [Express Web Service] for more information
   - `log`: A console object used to output non-request logs. Defaults to the global `console` object
   - `port/PORT`: The port that the application should run on. Defaults to `8080`.
@@ -245,6 +247,7 @@ This software is published by the Financial Times under the [MIT licence][licens
 [license]: http://opensource.org/licenses/MIT
 [morgan]: https://github.com/expressjs/morgan
 [ms-examples]: https://github.com/zeit/ms#examples
+[next metrics]: https://github.com/Financial-Times/next-metrics
 [node.js]: https://nodejs.org/
 [npm]: https://www.npmjs.com/
 [origami support]: mailto:origami-support@ft.com
