@@ -177,6 +177,10 @@ describe('lib/origami-service', () => {
 			assert.calledOnce(express);
 		});
 
+		it('enables the `case sensitive routing` Express setting', () => {
+			assert.calledWithExactly(express.mockApp.enable, 'case sensitive routing');
+		});
+
 		it('sets the `env` Express setting to `options.environment`', () => {
 			assert.calledWithExactly(express.mockApp.set, 'env', options.environment);
 		});

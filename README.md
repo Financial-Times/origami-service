@@ -68,6 +68,7 @@ The Express application will have some additional properties, added by the Origa
 
 The following [Express settings] will be set:
 
+  - `case sensitive routing`: Enabled
   - `json spaces`: Configured to prettify output JSON
   - `x-powered-by`: Disabled
   - `views`: Configured to the `views` folder
