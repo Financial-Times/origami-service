@@ -77,8 +77,7 @@ describe('lib/middleware/error-handler', () => {
 				assert.calledOnce(cacheControl);
 				assert.calledWith(cacheControl, {
 					maxAge: 0,
-					staleIfError: 0,
-					staleWhileRevalidate: 0
+					staleIfError: 0
 				});
 			});
 
@@ -231,8 +230,7 @@ describe('lib/middleware/error-handler', () => {
 					assert.calledOnce(cacheControl);
 					assert.calledWith(cacheControl, {
 						maxAge: '1d',
-						staleIfError: 0,
-						staleWhileRevalidate: 0
+						staleIfError: 0
 					});
 				});
 
