@@ -72,6 +72,11 @@ describe('lib/middleware/error-handler', () => {
 				assert.calledWithExactly(express.mockResponse.status, 500);
 			});
 
+			it('sets appropriate cache headers', () => {
+				assert.calledOnce(express.mockResponse.set);
+				assert.calledWithExactly(express.mockResponse.set, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store');
+			});
+
 			it('renders an error page with the expected context', () => {
 				assert.calledOnce(express.mockResponse.render);
 				assert.calledWith(express.mockResponse.render, 'error', {
