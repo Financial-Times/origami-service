@@ -108,7 +108,7 @@ The available options are as follows. Where two names are separated by a `/`, th
 
 ### `origamiService.middleware.notFound( [message] )`
 
-Create and return a middleware for throwing `404` "Not Found" errors. The returned middleware will pass on an error which can be caught later by an error handling middleware. The error will have a `status` property set to `404` so that your error handler can differentiate it from other errors.
+Create and return a middleware for throwing `404` "Not Found" errors. The returned middleware will pass on an error which can be caught later by an error handling middleware. The error will have a `status` property set to `404` so that your error handler can differentiate it from other errors, as well as a `cacheMaxAge` property set to `'30s'`.
 
 This middleware should be mounted after all of your application routes:
 
@@ -126,7 +126,12 @@ app.use(origamiService.middleware.notFound('This page does not exist'));
 
 ### `origamiService.middleware.errorHandler()`
 
-Create and return a middleware for rendering errors that occur in the application routes. The returned middleware logs errors to [Sentry] (if the `sentryDsn` option is present) and then renders an error page. It uses the `status` property of an error to decide on which error type to render.
+Create and return a middleware for rendering errors that occur in the application routes. The returned middleware logs errors to [Sentry] (if the `sentryDsn` option is present) and then renders an error page.
+
+The following properties can be set on an error object to change the behaviour of the error handler:
+
+  - `status`: decide on which error type to render and send the HTTP status code
+  - `cacheMaxAge`: the maximum cache age of the error, which gets passed to the [`cacheControl` middleware](#origamiservicemiddlewarecachecontrol-options-)
 
 This middleware should be mounted after all of your application routes, and is useful in conjunction with `origamiService.middleware.notFound`:
 

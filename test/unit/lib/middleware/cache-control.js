@@ -213,6 +213,16 @@ describe('lib/middleware/cache-control', () => {
 
 		});
 
+		describe('middleware(request, response)', () => {
+
+			it('does not error', () => {
+				assert.doesNotThrow(() => {
+					middleware(express.mockRequest, express.mockResponse);
+				});
+			});
+
+		});
+
 	});
 
 });

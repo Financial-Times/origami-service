@@ -46,6 +46,10 @@ describe('lib/middleware/not-found', () => {
 				assert.calledWithExactly(httpError, 404, 'mock message');
 			});
 
+			it('adds a `cacheMaxAge` property to the error, caching for 30 seconds', () => {
+				assert.strictEqual(httpError.mockError.cacheMaxAge, '30s');
+			});
+
 			it('calls `next` with the created error', () => {
 				assert.calledOnce(next);
 				assert.calledWithExactly(next, httpError.mockError);

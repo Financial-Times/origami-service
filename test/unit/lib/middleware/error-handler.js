@@ -5,12 +5,18 @@ const mockery = require('mockery');
 const sinon = require('sinon');
 
 describe('lib/middleware/error-handler', () => {
+	let cacheControl;
 	let express;
 	let errorHandler;
 	let log;
+	let mockCacheControlMiddleware;
 	let raven;
 
 	beforeEach(() => {
+		mockCacheControlMiddleware = sinon.stub();
+		cacheControl = sinon.stub().returns(mockCacheControlMiddleware);
+		mockery.registerMock('./cache-control', cacheControl);
+
 		express = require('../../mock/express.mock');
 
 		log = require('../../mock/log.mock');
@@ -67,14 +73,23 @@ describe('lib/middleware/error-handler', () => {
 				assert.calledWithExactly(log.error, 'Error: Oops');
 			});
 
+			it('creates a cacheControl middleware', () => {
+				assert.calledOnce(cacheControl);
+				assert.calledWith(cacheControl, {
+					maxAge: 0,
+					staleIfError: 0,
+					staleWhileRevalidate: 0
+				});
+			});
+
+			it('calls the cacheControl middleware with the request and response', () => {
+				assert.calledOnce(mockCacheControlMiddleware);
+				assert.calledWithExactly(mockCacheControlMiddleware, express.mockRequest, express.mockResponse);
+			});
+
 			it('sends an error status code', () => {
 				assert.calledOnce(express.mockResponse.status);
 				assert.calledWithExactly(express.mockResponse.status, 500);
-			});
-
-			it('sets appropriate cache headers', () => {
-				assert.calledOnce(express.mockResponse.set);
-				assert.calledWithExactly(express.mockResponse.set, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store');
 			});
 
 			it('renders an error page with the expected context', () => {
@@ -199,6 +214,25 @@ describe('lib/middleware/error-handler', () => {
 							message: error.message,
 							stack: null
 						}
+					});
+				});
+
+			});
+
+			describe('when the error `cacheMaxAge` property is set', () => {
+
+				beforeEach(() => {
+					error.cacheMaxAge = '1d';
+					cacheControl.reset();
+					middleware(error, express.mockRequest, express.mockResponse, next);
+				});
+
+				it('creates a cacheControl middleware with the given max age', () => {
+					assert.calledOnce(cacheControl);
+					assert.calledWith(cacheControl, {
+						maxAge: '1d',
+						staleIfError: 0,
+						staleWhileRevalidate: 0
 					});
 				});
 
