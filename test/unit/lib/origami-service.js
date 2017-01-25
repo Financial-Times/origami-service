@@ -151,6 +151,7 @@ describe('lib/origami-service', () => {
 				graphiteApiKey: 'mock-graphite-api-key',
 				healthCheck: sinon.spy(),
 				log: log,
+				metricsAppName: 'mock-metrics-app-name',
 				port: 1234,
 				region: 'US',
 				requestLogFormat: 'mock-log-format',
@@ -217,7 +218,7 @@ describe('lib/origami-service', () => {
 			assert.calledOnce(nextMetrics.Metrics);
 			assert.calledOnce(nextMetrics.mockInstance.init);
 			assert.calledWith(nextMetrics.mockInstance.init, {
-				app: options.about.systemCode,
+				app: options.metricsAppName,
 				flushEvery: 40000,
 				ftApiKey: options.graphiteApiKey,
 				hostedApiKey: false
@@ -413,9 +414,25 @@ describe('lib/origami-service', () => {
 
 		});
 
-		describe('when `options.about.systemCode` is not set', () => {
+		describe('when `options.metricsAppName` is not set', () => {
 
 			beforeEach(() => {
+				delete options.metricsAppName;
+				nextMetrics.mockInstance.init.reset();
+				app = origamiService(options);
+			});
+
+			it('uses `options.about.systemCode` as the app name in Next Metrics', () => {
+				assert.calledOnce(nextMetrics.mockInstance.init);
+				assert.strictEqual(nextMetrics.mockInstance.init.firstCall.args[0].app, options.about.systemCode);
+			});
+
+		});
+
+		describe('when `options.metricsAppName` and `options.about.systemCode` are not set', () => {
+
+			beforeEach(() => {
+				delete options.metricsAppName;
 				delete options.about.systemCode;
 				nextMetrics.mockInstance.init.reset();
 				app = origamiService(options);

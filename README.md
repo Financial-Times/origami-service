@@ -101,6 +101,7 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `graphiteApiKey/GRAPHITE_API_KEY`: The API key to use when accessing the FT's internal Graphite instance. If set to `null`, metrics will not be reported. Defaults to `null`. The `GRAPHITE_API_KEY` environment variable is aliased as `FT_GRAPHITE_APIKEY`
   - `healthCheck`: A function to use in calculating how healthy the application is. See [Express Web Service] for more information
   - `log`: A console object used to output non-request logs. Defaults to the global `console` object
+  - `metricsAppName`: The name of the application to use when logging to Graphite. Defaults to `about.systemCode` then `about.name`
   - `port/PORT`: The port that the application should run on. Defaults to `8080`.
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
   - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`
