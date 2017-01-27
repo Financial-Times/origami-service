@@ -40,6 +40,10 @@ describe('examples', () => {
 				});
 
 				example.stderr.on('data', chunk => {
+					// allow warnings
+					if (/^warning:/i.test(chunk.toString())) {
+						return;
+					}
 					clearTimeout(timeout);
 					example.kill('SIGKILL');
 					const error = new Error(`example output to stderr: ${chunk.toString()}`);

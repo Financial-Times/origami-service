@@ -476,6 +476,11 @@ describe('lib/origami-service', () => {
 				assert.notCalled(nextMetrics.mockInstance.init);
 			});
 
+			it('warns that metrics are not set up', () => {
+				assert.called(options.log.warn);
+				assert.calledWith(options.log.warn, 'Warning: metrics are not being recorded for this application. Please provide a GRAPHITE_API_KEY environment variable');
+			});
+
 		});
 
 		describe('when `options.requestLogFormat` is set to `null`', () => {
@@ -506,6 +511,11 @@ describe('lib/origami-service', () => {
 				assert.deepEqual(defaults.firstCall.args[2].sentryDsn, process.env.RAVEN_URL);
 			});
 
+			it('warns that a deprecated environment variable is being used', () => {
+				assert.called(options.log.warn);
+				assert.calledWith(options.log.warn, 'Warning: the RAVEN_URL environment variable has been deprecated. Use SENTRY_DSN instead');
+			});
+
 		});
 
 		describe('when the `FT_GRAPHITE_APIKEY` environment variable is set and `GRAPHITE_API_KEY` is not', () => {
@@ -518,6 +528,11 @@ describe('lib/origami-service', () => {
 
 			it('uses `FT_GRAPHITE_APIKEY` as a provider for the `graphiteApiKey` option', () => {
 				assert.deepEqual(defaults.firstCall.args[2].graphiteApiKey, process.env.FT_GRAPHITE_APIKEY);
+			});
+
+			it('warns that a deprecated environment variable is being used', () => {
+				assert.called(options.log.warn);
+				assert.calledWith(options.log.warn, 'Warning: the FT_GRAPHITE_APIKEY environment variable has been deprecated. Use GRAPHITE_API_KEY instead');
 			});
 
 		});
@@ -540,9 +555,14 @@ describe('lib/origami-service', () => {
 				assert.notCalled(raven.install);
 			});
 
-			it('creates and mounts Raven request handler middleware', () => {
+			it('does not create and mount Raven request handler middleware', () => {
 				assert.notCalled(raven.requestHandler);
 				assert.neverCalledWith(express.mockApp.use, raven.mockRequestMiddleware);
+			});
+
+			it('warns that Sentry is not set up', () => {
+				assert.called(options.log.warn);
+				assert.calledWith(options.log.warn, 'Warning: errors are not being logged to Sentry for this application. Please provide a SENTRY_DSN environment variable');
 			});
 
 		});
