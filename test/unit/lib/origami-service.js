@@ -85,6 +85,10 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(origamiService.defaults.environment, 'development');
 		});
 
+		it('has an `exposeErrorEndpoint` property', () => {
+			assert.isFalse(origamiService.defaults.exposeErrorEndpoint);
+		});
+
 		it('has a `graphiteApiKey` property', () => {
 			assert.isNull(origamiService.defaults.graphiteApiKey);
 		});
@@ -130,6 +134,7 @@ describe('lib/origami-service', () => {
 
 			// Define options in the environment and
 			// as an object (which takes priority)
+			process.env.EXPOSE_ERROR_ENDPOINT = '';
 			process.env.FT_GRAPHITE_APIKEY = 'env-ft-graphite-apikey';
 			process.env.GRAPHITE_API_KEY = 'env-graphite-api-key';
 			process.env.NODE_ENV = 'production';
@@ -147,6 +152,7 @@ describe('lib/origami-service', () => {
 				basePath: 'mock-base-path',
 				defaultLayout: 'mock-default-layout',
 				environment: 'test',
+				exposeErrorEndpoint: false,
 				goodToGoTest: sinon.spy(),
 				graphiteApiKey: 'mock-graphite-api-key',
 				healthCheck: sinon.spy(),
@@ -166,6 +172,7 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(defaults.firstCall.args[1], options);
 			assert.deepEqual(defaults.firstCall.args[2], {
 				environment: process.env.NODE_ENV,
+				exposeErrorEndpoint: process.env.EXPOSE_ERROR_ENDPOINT,
 				graphiteApiKey: process.env.GRAPHITE_API_KEY,
 				port: process.env.PORT,
 				region: process.env.REGION,
@@ -259,7 +266,12 @@ describe('lib/origami-service', () => {
 				manifestPath: 'mock-base-path/package.json',
 				about: options.about,
 				goodToGoTest: options.goodToGoTest,
-				healthCheck: options.healthCheck
+				healthCheck: options.healthCheck,
+				routes: [
+					'about',
+					'gtg',
+					'health'
+				]
 			});
 			assert.calledWithExactly(express.mockApp.use, expressWebService.mockMiddleware);
 		});
@@ -410,6 +422,25 @@ describe('lib/origami-service', () => {
 
 			it('sets the purpose to a default', () => {
 				assert.strictEqual(app.origami.options.about.purpose, 'An Origami web service.');
+			});
+
+		});
+
+		describe('when `options.exposeErrorEndpoint` is truthy', () => {
+
+			beforeEach(() => {
+				expressWebService.reset();
+				options.exposeErrorEndpoint = true;
+				app = origamiService(options);
+			});
+
+			it('creates and mounts Express Web Service middleware with an error endpoint', () => {
+				assert.deepEqual(expressWebService.firstCall.args[0].routes, [
+					'about',
+					'gtg',
+					'health',
+					'error'
+				]);
 			});
 
 		});
