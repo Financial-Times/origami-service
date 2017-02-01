@@ -47,6 +47,7 @@ describe('lib/middleware/error-handler', () => {
 			let next;
 
 			beforeEach(() => {
+				express.mockRequest.url = 'mock-url';
 				express.mockRequest.app.origami = {
 					log,
 					options: {
@@ -71,7 +72,7 @@ describe('lib/middleware/error-handler', () => {
 
 			it('logs the error and escaped error stack', () => {
 				assert.calledOnce(log.error);
-				assert.match(log.error.firstCall.args[0], /^Error: Oops stack="[^"\n]+"$/);
+				assert.match(log.error.firstCall.args[0], /^Server Error message="Oops" status=500 stack="[^"\n]+" url="mock-url"$/);
 			});
 
 			it('creates a cacheControl middleware', () => {
@@ -196,13 +197,14 @@ describe('lib/middleware/error-handler', () => {
 
 				beforeEach(() => {
 					error.status = 499;
+					delete error.stack;
 					log.error.reset();
 					express.mockResponse.render.reset();
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
 				it('does not log the error', () => {
-					assert.neverCalledWith(log.error, 'Error: Oops');
+					assert.neverCalledWith(log.error, 'Server Error message="Oops" status=499 stack=null url="mock-url"');
 				});
 
 				it('does not include the stack when rendering the error', () => {
@@ -230,7 +232,7 @@ describe('lib/middleware/error-handler', () => {
 
 				it('logs the error and null error stack', () => {
 					assert.calledOnce(log.error);
-					assert.calledWithExactly(log.error, 'Error: Oops stack=null');
+					assert.calledWithExactly(log.error, 'Server Error message="Oops" status=500 stack=null url="mock-url"');
 				});
 
 			});
