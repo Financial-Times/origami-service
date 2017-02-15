@@ -19,6 +19,7 @@ Table Of Contents
     - [Examples](#examples)
   - [Contributing](#contributing)
   - [Publishing](#publishing)
+  - [Support and Migration](#support-and-migration)
   - [Contact](#contact)
   - [Licence](#licence)
 
@@ -217,6 +218,21 @@ Publishing
 ----------
 
 New versions of the module are published automatically by CI when a new tag is created matching the pattern `/v.*/`.
+
+
+Support and Migration
+---------------------
+
+Origami Service major versions are normally supported for 3–6 months after their last minor release. This means that patch-level changes will be added and bugs will be fixed. The table below outlines the end-of-support dates for major versions, and the last minor release for that version.
+
+We also maintain a [migration guide](MIGRATION.md) to help you migrate.
+
+| :grey_question: | Major Version | Last Minor Release | Node.js Versions | Support End Date |
+| :-------------- | :------------ | :----------------- | :--------------- | :--------------- |
+| :heart:         | 2             | N/A                | 6+               | N/A              |
+| :hourglass:     | 1             | 1.6                | 6                | 2017-05-15       |
+
+If you're opening issues related to these, please mention the version that the issue relates to.
 
 
 Contact
