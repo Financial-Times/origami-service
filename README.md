@@ -175,18 +175,6 @@ app.get('/docs', origamiService.middleware.cacheControl({maxAge: '1 day'}), () =
 });
 ```
 
-### `origamiService.middleware.requireSourceParam()`
-
-Create and return a middleware for throwing `400` "Bad Request" errors. The returned middleware will pass on an error which can be caught later by an error handling middleware if a `source` parameter is not present in the request querystring.
-
-This middleware is best used per-route, rather than at the application level:
-
-```js
-app.get('/api/v1', origamiService.middleware.requireSourceParam(), () => {
-    // route stuff
-});
-```
-
 ### Examples
 
 You can find example implementations of Origami-compliant services in the `examples` folder of this repo:
