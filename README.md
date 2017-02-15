@@ -101,14 +101,14 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `exposeErrorEndpoint/EXPOSE_ERROR_ENDPOINT`: Whether to expose the `/__error` endpoint for debugging purposes. This should be `false` in production. Defaults to `false`
   - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`
   - `goodToGoTest`: A function to use in calculating whether the application is good to go. See [Express Web Service] for more information
-  - `graphiteApiKey/GRAPHITE_API_KEY`: The API key to use when accessing the FT's internal Graphite instance. If set to `null`, metrics will not be reported. Defaults to `null`. The `GRAPHITE_API_KEY` environment variable is aliased as `FT_GRAPHITE_APIKEY` but this is deprecated
+  - `graphiteApiKey/GRAPHITE_API_KEY`: The API key to use when accessing the FT's internal Graphite instance. If set to `null`, metrics will not be reported. Defaults to `null`
   - `healthCheck`: A function to use in calculating how healthy the application is. See [Express Web Service] for more information
   - `log`: A console object used to output non-request logs. Defaults to the global `console` object
   - `metricsAppName`: The name of the application to use when logging to Graphite. Defaults to `about.systemCode` then `about.name`
   - `port/PORT`: The port that the application should run on. Defaults to `8080`.
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
   - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`
-  - `sentryDsn/SENTRY_DSN`: The [Sentry] DSN to send errors to. If set to `null`, errors will not be sent to Sentry. Defaults to `null`. The `SENTRY_DSN` environment variable is aliased as `RAVEN_URL` but this is deprecated
+  - `sentryDsn/SENTRY_DSN`: The [Sentry] DSN to send errors to. If set to `null`, errors will not be sent to Sentry. Defaults to `null`
 
 ### `origamiService.middleware.notFound( [message] )`
 

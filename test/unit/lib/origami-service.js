@@ -135,11 +135,9 @@ describe('lib/origami-service', () => {
 			// Define options in the environment and
 			// as an object (which takes priority)
 			process.env.EXPOSE_ERROR_ENDPOINT = '';
-			process.env.FT_GRAPHITE_APIKEY = 'env-ft-graphite-apikey';
 			process.env.GRAPHITE_API_KEY = 'env-graphite-api-key';
 			process.env.NODE_ENV = 'production';
 			process.env.PORT = 5678;
-			process.env.RAVEN_URL = 'env-raven-url';
 			process.env.REGION = 'The Moon';
 			process.env.SENTRY_DSN = 'env-sentry-dsn';
 			options = {
@@ -530,44 +528,6 @@ describe('lib/origami-service', () => {
 
 		});
 
-		describe('when the `RAVEN_URL` environment variable is set and `SENTRY_DSN` is not', () => {
-
-			beforeEach(() => {
-				defaults.reset();
-				delete process.env.SENTRY_DSN;
-				app = origamiService(options);
-			});
-
-			it('uses `RAVEN_URL` as a provider for the `sentryDsn` option', () => {
-				assert.deepEqual(defaults.firstCall.args[2].sentryDsn, process.env.RAVEN_URL);
-			});
-
-			it('warns that a deprecated environment variable is being used', () => {
-				assert.called(options.log.warn);
-				assert.calledWith(options.log.warn, 'Warning: the RAVEN_URL environment variable has been deprecated. Use SENTRY_DSN instead');
-			});
-
-		});
-
-		describe('when the `FT_GRAPHITE_APIKEY` environment variable is set and `GRAPHITE_API_KEY` is not', () => {
-
-			beforeEach(() => {
-				defaults.reset();
-				delete process.env.GRAPHITE_API_KEY;
-				app = origamiService(options);
-			});
-
-			it('uses `FT_GRAPHITE_APIKEY` as a provider for the `graphiteApiKey` option', () => {
-				assert.deepEqual(defaults.firstCall.args[2].graphiteApiKey, process.env.FT_GRAPHITE_APIKEY);
-			});
-
-			it('warns that a deprecated environment variable is being used', () => {
-				assert.called(options.log.warn);
-				assert.calledWith(options.log.warn, 'Warning: the FT_GRAPHITE_APIKEY environment variable has been deprecated. Use GRAPHITE_API_KEY instead');
-			});
-
-		});
-
 		describe('when `options.sentryDsn` is not defined', () => {
 
 			beforeEach(() => {
@@ -576,7 +536,6 @@ describe('lib/origami-service', () => {
 				raven.requestHandler.reset();
 				express.mockApp.use.reset();
 				delete process.env.SENTRY_DSN;
-				delete process.env.RAVEN_URL;
 				delete options.sentryDsn;
 				app = origamiService(options);
 			});
