@@ -505,6 +505,11 @@ describe('lib/origami-service', () => {
 				assert.notCalled(nextMetrics.mockInstance.init);
 			});
 
+			it('stores a mock instance in `app.origami.metrics`', () => {
+				assert.isObject(express.mockApp.origami.metrics);
+				assert.isFunction(express.mockApp.origami.metrics.count);
+			});
+
 			it('warns that metrics are not set up', () => {
 				assert.called(options.log.warn);
 				assert.calledWith(options.log.warn, 'Warning: metrics are not being recorded for this application. Please provide a GRAPHITE_API_KEY environment variable');
