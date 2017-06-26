@@ -142,9 +142,14 @@ describe('lib/middleware/purge-urls', () => {
 				assert.calledWithExactly(log.info, 'Purged URLs successfully');
 			});
 
-			it('responds with "OK"', () => {
+			it('responds with a 202 status', () => {
+				assert.calledOnce(express.mockResponse.status);
+				assert.calledWithExactly(express.mockResponse.status, 202);
+			});
+
+			it('responds with "Purging URLs"', () => {
 				assert.calledOnce(express.mockResponse.send);
-				assert.calledWithExactly(express.mockResponse.send, 'OK');
+				assert.calledWithExactly(express.mockResponse.send, 'Purging URLs');
 			});
 
 			it('does not call `next`', () => {
@@ -154,6 +159,7 @@ describe('lib/middleware/purge-urls', () => {
 			describe('when `request` has a `wait` query parameter', () => {
 
 				beforeEach(() => {
+					express.mockResponse.status.resetHistory();
 					express.mockResponse.send.resetHistory();
 					express.mockRequest.query.wait = '1000';
 					sinon.stub(global, 'setTimeout').yieldsAsync();
@@ -174,12 +180,14 @@ describe('lib/middleware/purge-urls', () => {
 			describe('when `request` does not have an `apiKey` query parameter', () => {
 
 				beforeEach(() => {
+					express.mockResponse.status.resetHistory();
 					express.mockResponse.send.resetHistory();
 					delete express.mockRequest.query.apiKey;
 					return middleware(express.mockRequest, express.mockResponse, next);
 				});
 
-				it('does not respond with "OK"', () => {
+				it('does not respond', () => {
+					assert.notCalled(express.mockResponse.status);
 					assert.notCalled(express.mockResponse.send);
 				});
 
@@ -195,12 +203,14 @@ describe('lib/middleware/purge-urls', () => {
 			describe('when the `request` has an incorrect `apiKey` query parameter', () => {
 
 				beforeEach(() => {
+					express.mockResponse.status.resetHistory();
 					express.mockResponse.send.resetHistory();
 					express.mockRequest.query.apiKey = 'not-the-key';
 					return middleware(express.mockRequest, express.mockResponse, next);
 				});
 
-				it('does not respond with "OK"', () => {
+				it('does not respond', () => {
+					assert.notCalled(express.mockResponse.status);
 					assert.notCalled(express.mockResponse.send);
 				});
 
@@ -217,19 +227,15 @@ describe('lib/middleware/purge-urls', () => {
 				let mockHttpError;
 
 				beforeEach(() => {
+					express.mockResponse.status.resetHistory();
 					express.mockResponse.send.resetHistory();
 					mockHttpError = new Error('http error');
 					httpRequest.rejects(mockHttpError);
 					return middleware(express.mockRequest, express.mockResponse, next);
 				});
 
-				it('does not respond with "OK"', () => {
-					assert.notCalled(express.mockResponse.send);
-				});
-
-				it('Calls `next` with the HTTP error', () => {
-					assert.calledOnce(next);
-					assert.calledWithExactly(next, mockHttpError);
+				it('Logs the HTTP error', () => {
+					assert.calledWithExactly(log.error, 'Error purging URLs: http error');
 				});
 
 			});
@@ -237,19 +243,14 @@ describe('lib/middleware/purge-urls', () => {
 			describe('when one of the HTTP requests responds with a 401 status code', () => {
 
 				beforeEach(() => {
-					express.mockResponse.send.resetHistory();
+					log.error.reset();
 					mockHttpResponse.statusCode = 401;
 					return middleware(express.mockRequest, express.mockResponse, next);
 				});
 
-				it('does not respond with "OK"', () => {
-					assert.notCalled(express.mockResponse.send);
-				});
-
-				it('Calls `next` with a descriptive error', () => {
-					assert.calledOnce(next);
-					assert.instanceOf(next.firstCall.args[0], Error);
-					assert.match(next.firstCall.args[0].message, /Unable to purge URL from Fastly, permission denied for: https:\/\/mock-url\//i);
+				it('Logs a descriptive error', () => {
+					assert.calledOnce(log.error);
+					assert.match(log.error.firstCall.args[0], /Unable to purge URL from Fastly, permission denied for: https:\/\/mock-url\//i);
 				});
 
 			});
@@ -257,19 +258,14 @@ describe('lib/middleware/purge-urls', () => {
 			describe('when one of the HTTP requests responds with an unsuccessful status code', () => {
 
 				beforeEach(() => {
-					express.mockResponse.send.resetHistory();
+					log.error.reset();
 					mockHttpResponse.statusCode = 500;
 					return middleware(express.mockRequest, express.mockResponse, next);
 				});
 
-				it('does not respond with "OK"', () => {
-					assert.notCalled(express.mockResponse.send);
-				});
-
-				it('Calls `next` with a generic server error', () => {
-					assert.calledOnce(next);
-					assert.instanceOf(next.firstCall.args[0], Error);
-					assert.match(next.firstCall.args[0].message, /Unable to purge URL from Fastly: https:\/\/mock-url\//i);
+				it('Logs a generic server error', () => {
+					assert.calledOnce(log.error);
+					assert.match(log.error.firstCall.args[0], /Unable to purge URL from Fastly: https:\/\/mock-url\//i);
 				});
 
 			});
