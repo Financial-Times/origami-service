@@ -32,6 +32,8 @@
     "ms": "^0.7.2",
     "next-metrics": "^1.45.0",
     "raven": "^1.1.1",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.4",
     "require-all": "^2.1.0",
     "varname": "^2.0.3"
   },
@@ -42,8 +44,7 @@
     "npm-prepublish": "^1.2.2",
     "nyc": "^10.2.0",
     "proclaim": "^3.4.4",
-    "sinon": "^1.17.6",
-    "sinon-as-promised": "^4.0.2"
+    "sinon": "^2.3.5"
   },
   "nyc": {
     "exclude": [

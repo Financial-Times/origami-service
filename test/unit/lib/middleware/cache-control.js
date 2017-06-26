@@ -88,7 +88,7 @@ describe('lib/middleware/cache-control', () => {
 			describe('when `options.staleIfError` is set', () => {
 
 				beforeEach(() => {
-					ms.reset();
+					ms.resetHistory();
 					express.mockResponse.set.reset();
 					middleware = cacheControl({
 						maxAge: '1 hour',
@@ -120,7 +120,7 @@ describe('lib/middleware/cache-control', () => {
 			describe('when `options.staleIfError` is set to a falsy value but not undefined', () => {
 
 				beforeEach(() => {
-					ms.reset();
+					ms.resetHistory();
 					express.mockResponse.set.reset();
 					middleware = cacheControl({
 						maxAge: '1 hour',
@@ -151,7 +151,7 @@ describe('lib/middleware/cache-control', () => {
 			describe('when `options.staleWhileRevalidate` is set', () => {
 
 				beforeEach(() => {
-					ms.reset();
+					ms.resetHistory();
 					express.mockResponse.set.reset();
 					middleware = cacheControl({
 						maxAge: '1 hour',
@@ -183,7 +183,7 @@ describe('lib/middleware/cache-control', () => {
 			describe('when `options.staleWhileRevalidate` is set to a falsy value but not undefined', () => {
 
 				beforeEach(() => {
-					ms.reset();
+					ms.resetHistory();
 					express.mockResponse.set.reset();
 					middleware = cacheControl({
 						maxAge: '1 hour',

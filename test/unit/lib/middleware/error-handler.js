@@ -113,8 +113,8 @@ describe('lib/middleware/error-handler', () => {
 			describe('when `request.app.origami.options.sentryDsn` is not defined', () => {
 
 				beforeEach(() => {
-					express.mockResponse.status.reset();
-					express.mockResponse.send.reset();
+					express.mockResponse.status.resetHistory();
+					express.mockResponse.send.resetHistory();
 					raven.mockErrorMiddleware.reset();
 					delete express.mockRequest.app.origami.options.sentryDsn;
 					middleware(error, express.mockRequest, express.mockResponse, next);
@@ -152,7 +152,7 @@ describe('lib/middleware/error-handler', () => {
 
 				beforeEach(() => {
 					error.status = 567;
-					express.mockResponse.status.reset();
+					express.mockResponse.status.resetHistory();
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
@@ -167,7 +167,7 @@ describe('lib/middleware/error-handler', () => {
 
 				beforeEach(() => {
 					error.statusCode = 567;
-					express.mockResponse.status.reset();
+					express.mockResponse.status.resetHistory();
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
@@ -182,7 +182,7 @@ describe('lib/middleware/error-handler', () => {
 
 				beforeEach(() => {
 					error.status_code = 567;
-					express.mockResponse.status.reset();
+					express.mockResponse.status.resetHistory();
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
@@ -241,7 +241,7 @@ describe('lib/middleware/error-handler', () => {
 
 				beforeEach(() => {
 					error.cacheMaxAge = '1d';
-					cacheControl.reset();
+					cacheControl.resetHistory();
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
@@ -261,7 +261,7 @@ describe('lib/middleware/error-handler', () => {
 				beforeEach(() => {
 					renderError = new Error('render-error');
 					express.mockResponse.render.yields(renderError);
-					express.mockResponse.send.reset();
+					express.mockResponse.send.resetHistory();
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
@@ -278,7 +278,7 @@ describe('lib/middleware/error-handler', () => {
 
 					beforeEach(() => {
 						error.status = 400;
-						express.mockResponse.send.reset();
+						express.mockResponse.send.resetHistory();
 						middleware(error, express.mockRequest, express.mockResponse, next);
 					});
 

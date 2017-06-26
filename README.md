@@ -176,6 +176,32 @@ app.get('/docs', origamiService.middleware.cacheControl({maxAge: '1 day'}), () =
 });
 ```
 
+### `origamiService.middleware.purgeUrls( options )`
+
+Create a purge route which will purge all of the given URLs in Fastly when the endpoint is POSTed to. This endpoint accepts general options as well as per-request options in the querystring.
+
+The general options are:
+
+  - `fastlyApiKey/FASTLY_PURGE_API_KEY`: The Fastly API key to use when purging URLs
+  - `purgeApiKey/PURGE_API_KEY`: The API key that is required when a user requests the purge endpoint. If they don't provide this, then the purge will not be performed
+  - `urls`: The URLs that will be purged as an array of strings. This should contain full URLs with a scheme and hostname, that are permitted to be purged with the given Fastly API key
+
+When a user requests the created endpoint, they can use query string parameters to change behaviour:
+
+  - `apiKey`: This is required, and must match the `purgeApiKey` option to work. If this is not provided or is incorrect, an error will be displayed
+  - `wait`: A number of milliseconds to wait before the purge is performed. This can be used to ensure that the purge is performed only once a new version of the application is running. Defaults to `0`
+
+This middleware should be mounted as a route, rather than at the application level:
+
+```js
+app.post('/purge', origamiService.middleware.purgeUrls({
+    urls: [
+        'https://example.com/url-1',
+        'https://example.com/url-2'
+    ]
+}));
+```
+
 ### Examples
 
 You can find example implementations of Origami-compliant services in the `examples` folder of this repo:
