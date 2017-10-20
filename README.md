@@ -64,10 +64,10 @@ app.listen(); // runs on port 1234 and returns a promise
 
 The Express application will have some additional properties, added by the Origami Service module. These will also be added to `app.locals` so they're available in your views.
 
-  - `app.origami.log`: The logger passed in to the service
-  - `app.origami.metrics`: The [Next Metrics] instance which can be used to send additional data to Graphite
-  - `app.origami.options`: The defaulted [options](#options) passed into the `origamiService` call
-  - `app.origami.server`: The [HTTP Server] which was returned by `app.listen`
+  - `app.ft.log`: The logger passed in to the service
+  - `app.ft.metrics`: The [Next Metrics] instance which can be used to send additional data to Graphite
+  - `app.ft.options`: The defaulted [options](#options) passed into the `origamiService` call
+  - `app.ft.server`: The [HTTP Server] which was returned by `app.listen`
 
 The following [Express settings] will be set:
 

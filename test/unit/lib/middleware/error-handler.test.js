@@ -74,7 +74,7 @@ describe('lib/middleware/error-handler', () => {
 
 			beforeEach(() => {
 				express.mockRequest.url = 'mock-url';
-				express.mockRequest.app.origami = {
+				express.mockRequest.app.ft = {
 					log,
 					options: {
 						sentryDsn: 'mock-sentry-dsn'
@@ -136,13 +136,13 @@ describe('lib/middleware/error-handler', () => {
 				assert.calledWithExactly(express.mockResponse.send, 'mock-html');
 			});
 
-			describe('when `request.app.origami.options.sentryDsn` is not defined', () => {
+			describe('when `request.app.ft.options.sentryDsn` is not defined', () => {
 
 				beforeEach(() => {
 					express.mockResponse.status.resetHistory();
 					express.mockResponse.send.resetHistory();
 					raven.mockErrorMiddleware.reset();
-					delete express.mockRequest.app.origami.options.sentryDsn;
+					delete express.mockRequest.app.ft.options.sentryDsn;
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
@@ -168,11 +168,11 @@ describe('lib/middleware/error-handler', () => {
 
 			});
 
-			describe('when `request.app.origami.options.environment` is "production"', () => {
+			describe('when `request.app.ft.options.environment` is "production"', () => {
 
 				beforeEach(() => {
 					express.mockResponse.render.reset();
-					express.mockRequest.app.origami.options.environment = 'production';
+					express.mockRequest.app.ft.options.environment = 'production';
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
