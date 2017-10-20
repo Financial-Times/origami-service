@@ -93,7 +93,7 @@ describe('lib/middleware/purge-urls', () => {
 				};
 				httpRequest.resolves(mockHttpResponse);
 				express.mockRequest.query.apiKey = 'mock-purge-key';
-				express.mockApp.origami = {log};
+				express.mockApp.ft = {log};
 				next = sinon.spy();
 				return middleware(express.mockRequest, express.mockResponse, next);
 			});

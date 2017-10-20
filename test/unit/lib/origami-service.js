@@ -322,16 +322,16 @@ describe('lib/origami-service', () => {
 			assert.calledWith(log.info, 'Test App configured (graphite=true logging=true sentry=true)');
 		});
 
-		it('stores additional data in the `app.origami` object', () => {
-			assert.isObject(express.mockApp.origami);
+		it('stores additional data in the `app.ft` object', () => {
+			assert.isObject(express.mockApp.ft);
 		});
 
-		it('stores the defaulted options in `app.origami.options`', () => {
-			assert.strictEqual(express.mockApp.origami.options, defaults.firstCall.returnValue);
+		it('stores the defaulted options in `app.ft.options`', () => {
+			assert.strictEqual(express.mockApp.ft.options, defaults.firstCall.returnValue);
 		});
 
-		it('stores useful application paths in `app.origami.paths`', () => {
-			assert.deepEqual(express.mockApp.origami.paths, {
+		it('stores useful application paths in `app.ft.paths`', () => {
+			assert.deepEqual(express.mockApp.ft.paths, {
 				base: 'mock-base-path',
 				manifest: 'mock-base-path/package.json',
 				public: 'mock-base-path/public',
@@ -341,16 +341,16 @@ describe('lib/origami-service', () => {
 			});
 		});
 
-		it('stores the logger in `app.origami.log`', () => {
-			assert.strictEqual(express.mockApp.origami.log.info, options.log.info);
+		it('stores the logger in `app.ft.log`', () => {
+			assert.strictEqual(express.mockApp.ft.log.info, options.log.info);
 		});
 
-		it('stores the Next Metrics instance in `app.origami.metrics`', () => {
-			assert.strictEqual(express.mockApp.origami.metrics, nextMetrics.mockInstance);
+		it('stores the Next Metrics instance in `app.ft.metrics`', () => {
+			assert.strictEqual(express.mockApp.ft.metrics, nextMetrics.mockInstance);
 		});
 
-		it('stores a copy of `app.origami` in `app.locals.origami`', () => {
-			assert.strictEqual(express.mockApp.origami, express.mockApp.locals.origami);
+		it('stores a copy of `app.ft` in `app.locals.ft`', () => {
+			assert.strictEqual(express.mockApp.ft, express.mockApp.locals.ft);
 		});
 
 		it('returns the created Express application', () => {
@@ -365,7 +365,7 @@ describe('lib/origami-service', () => {
 			});
 
 			it('sets the schema version to 1', () => {
-				assert.strictEqual(app.origami.options.about.schemaVersion, 1);
+				assert.strictEqual(app.ft.options.about.schemaVersion, 1);
 			});
 
 		});
@@ -378,7 +378,7 @@ describe('lib/origami-service', () => {
 			});
 
 			it('sets the name to the manifest name', () => {
-				assert.strictEqual(app.origami.options.about.name, manifest.name);
+				assert.strictEqual(app.ft.options.about.name, manifest.name);
 			});
 
 		});
@@ -392,7 +392,7 @@ describe('lib/origami-service', () => {
 			});
 
 			it('sets the name to a default', () => {
-				assert.strictEqual(app.origami.options.about.name, 'Origami Service');
+				assert.strictEqual(app.ft.options.about.name, 'Origami Service');
 			});
 
 		});
@@ -405,7 +405,7 @@ describe('lib/origami-service', () => {
 			});
 
 			it('sets the purpose to the manifest description', () => {
-				assert.strictEqual(app.origami.options.about.purpose, manifest.description);
+				assert.strictEqual(app.ft.options.about.purpose, manifest.description);
 			});
 
 		});
@@ -419,7 +419,7 @@ describe('lib/origami-service', () => {
 			});
 
 			it('sets the purpose to a default', () => {
-				assert.strictEqual(app.origami.options.about.purpose, 'An Origami web service.');
+				assert.strictEqual(app.ft.options.about.purpose, 'An Origami web service.');
 			});
 
 		});
@@ -505,9 +505,9 @@ describe('lib/origami-service', () => {
 				assert.notCalled(nextMetrics.mockInstance.init);
 			});
 
-			it('stores a mock instance in `app.origami.metrics`', () => {
-				assert.isObject(express.mockApp.origami.metrics);
-				assert.isFunction(express.mockApp.origami.metrics.count);
+			it('stores a mock instance in `app.ft.metrics`', () => {
+				assert.isObject(express.mockApp.ft.metrics);
+				assert.isFunction(express.mockApp.ft.metrics.count);
 			});
 
 			it('warns that metrics are not set up', () => {
@@ -595,8 +595,8 @@ describe('lib/origami-service', () => {
 					assert.strictEqual(resolvedValue, app);
 				});
 
-				it('stores the created server in `app.origami.server`', () => {
-					assert.strictEqual(app.origami.server, express.mockServer);
+				it('stores the created server in `app.ft.server`', () => {
+					assert.strictEqual(app.ft.server, express.mockServer);
 				});
 
 				it('logs that the application has started', () => {
