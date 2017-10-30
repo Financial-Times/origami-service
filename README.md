@@ -137,6 +137,7 @@ The following properties can be set on an error object to change the behaviour o
 
   - `status`: decide on which error type to render and send the HTTP status code
   - `cacheMaxAge`: the maximum cache age of the error, which gets passed to the [`cacheControl` middleware](#origamiservicemiddlewarecachecontrol-options-)
+  - `skipSentry`: if set to `true`, the error will not be reported to Sentry
 
 This middleware should be mounted after all of your application routes, and is useful in conjunction with `origamiService.middleware.notFound`:
 

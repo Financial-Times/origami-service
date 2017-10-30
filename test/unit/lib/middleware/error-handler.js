@@ -126,6 +126,22 @@ describe('lib/middleware/error-handler', () => {
 
 			});
 
+			describe('when `error.skipSentry` is set', () => {
+
+				beforeEach(() => {
+					express.mockResponse.status.resetHistory();
+					express.mockResponse.send.resetHistory();
+					raven.mockErrorMiddleware.reset();
+					error.skipSentry = true;
+					middleware(error, express.mockRequest, express.mockResponse, next);
+				});
+
+				it('does not call the Raven error handler middleware', () => {
+					assert.notCalled(raven.mockErrorMiddleware);
+				});
+
+			});
+
 			describe('when `request.app.origami.options.environment` is "production"', () => {
 
 				beforeEach(() => {
