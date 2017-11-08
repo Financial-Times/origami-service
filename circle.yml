@@ -5,8 +5,7 @@ machine:
 
 test:
   override:
-    - make verify
-    - make test
+    - make ci
 
 deployment:
   release:
