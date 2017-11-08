@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 describe('examples', () => {
-	const basePath = path.resolve(__dirname, '../../example');
+	const basePath = path.resolve(__dirname, '../../../example');
 
 	fs.readdirSync(basePath).forEach(directory => {
 		describe(directory, () => {

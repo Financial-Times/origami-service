@@ -38,6 +38,7 @@
     "varname": "^2.0.3"
   },
   "devDependencies": {
+    "@financial-times/origami-service-makefile": "^6.0.0",
     "eslint": "^4.7.2",
     "mocha": "^3.5.3",
     "mockery": "^2.1.0",
