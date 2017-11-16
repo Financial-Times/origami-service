@@ -109,6 +109,7 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `port/PORT`: The port that the application should run on. Defaults to `8080`.
   - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
   - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be output. Defaults to `'combined'`
+  - `sentryConfig`: Additional [Sentry] configurations. This is passed directly to the Raven configuration, [see here for more information][raven-config]. Defaults to `{}`
   - `sentryDsn/SENTRY_DSN`: The [Sentry] DSN to send errors to. If set to `null`, errors will not be sent to Sentry. Defaults to `null`
 
 ### `origamiService.middleware.notFound( [message] )`
@@ -293,5 +294,6 @@ This software is published by the Financial Times under the [MIT licence][licens
 [npm]: https://www.npmjs.com/
 [origami support]: mailto:origami-support@ft.com
 [promises]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[raven-config]: https://docs.sentry.io/clients/node/config/#optional-settings
 [sentry]: https://sentry.io/
 [static]: https://expressjs.com/en/starter/static-files.html

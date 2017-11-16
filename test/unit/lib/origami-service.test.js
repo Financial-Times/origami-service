@@ -109,6 +109,11 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(origamiService.defaults.requestLogFormat, 'combined');
 		});
 
+		it('has a `sentryConfig` property', () => {
+			assert.isObject(origamiService.defaults.sentryConfig);
+			assert.deepEqual(origamiService.defaults.sentryConfig, {});
+		});
+
 		it('has a `sentryDsn` property', () => {
 			assert.isNull(origamiService.defaults.sentryDsn);
 		});
@@ -159,6 +164,9 @@ describe('lib/origami-service', () => {
 				port: 1234,
 				region: 'US',
 				requestLogFormat: 'mock-log-format',
+				sentryConfig: {
+					isMockSentryConfig: true
+				},
 				sentryDsn: 'mock-sentry-dsn'
 			};
 
@@ -249,7 +257,7 @@ describe('lib/origami-service', () => {
 		it('configures and installs Raven', () => {
 			assert.calledOnce(raven.config);
 			assert.calledOnce(raven.install);
-			assert.calledWithExactly(raven.config, options.sentryDsn);
+			assert.calledWithExactly(raven.config, options.sentryDsn, options.sentryConfig);
 		});
 
 		it('creates and mounts Raven request handler middleware', () => {
