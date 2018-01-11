@@ -6,6 +6,7 @@ const sinon = require('sinon');
 
 describe('lib/middleware/error-handler', () => {
 	let cacheControl;
+	let defaults;
 	let express;
 	let errorHandler;
 	let log;
@@ -16,6 +17,9 @@ describe('lib/middleware/error-handler', () => {
 		mockCacheControlMiddleware = sinon.stub();
 		cacheControl = sinon.stub().returns(mockCacheControlMiddleware);
 		mockery.registerMock('./cache-control', cacheControl);
+
+		defaults = sinon.spy(require('lodash/defaults'));
+		mockery.registerMock('lodash/defaults', defaults);
 
 		express = require('../../mock/express.mock');
 
@@ -31,11 +35,33 @@ describe('lib/middleware/error-handler', () => {
 		assert.isFunction(errorHandler);
 	});
 
-	describe('errorHandler()', () => {
+	it('has a `defaults` property', () => {
+		assert.isObject(errorHandler.defaults);
+	});
+
+	describe('.defaults', () => {
+
+		it('has an `outputJson` property', () => {
+			assert.isFalse(errorHandler.defaults.outputJson);
+		});
+
+	});
+
+	describe('errorHandler(options)', () => {
 		let middleware;
+		let options;
 
 		beforeEach(() => {
-			middleware = errorHandler();
+			options = {
+				mockOption: true
+			};
+			middleware = errorHandler(options);
+		});
+
+		it('defaults the passed in options', () => {
+			assert.isObject(defaults.firstCall.args[0]);
+			assert.strictEqual(defaults.firstCall.args[1], options);
+			assert.strictEqual(defaults.firstCall.args[2], errorHandler.defaults);
 		});
 
 		it('returns a middleware function', () => {
@@ -157,7 +183,7 @@ describe('lib/middleware/error-handler', () => {
 						error: {
 							status: 500,
 							message: error.message,
-							stack: null
+							stack: undefined
 						}
 					});
 				});
@@ -230,7 +256,7 @@ describe('lib/middleware/error-handler', () => {
 						error: {
 							status: 499,
 							message: error.message,
-							stack: null
+							stack: undefined
 						}
 					});
 				});
@@ -305,6 +331,50 @@ describe('lib/middleware/error-handler', () => {
 						assert.notInclude(html, renderError.stack);
 					});
 
+				});
+
+			});
+
+		});
+
+		describe('when `options.outputJson` is `true`', () => {
+
+			beforeEach(() => {
+				options = {
+					outputJson: true
+				};
+				middleware = errorHandler(options);
+			});
+
+			describe('middleware(error, request, response, next)', () => {
+				let error;
+				let next;
+
+				beforeEach(() => {
+					express.mockRequest.url = 'mock-url';
+					express.mockRequest.app.origami = {
+						log,
+						options: {
+							sentryDsn: 'mock-sentry-dsn'
+						}
+					};
+					error = new Error('Oops');
+					next = sinon.spy();
+					raven.mockErrorMiddleware.yields(error);
+					middleware(error, express.mockRequest, express.mockResponse, next);
+				});
+
+				it('responds with the error details as JSON', () => {
+					assert.calledOnce(express.mockResponse.send);
+					assert.calledWithExactly(express.mockResponse.send, {
+						status: 500,
+						message: error.message,
+						stack: error.stack
+					});
+				});
+
+				it('does not render an error page', () => {
+					assert.notCalled(express.mockResponse.render);
 				});
 
 			});
