@@ -81,6 +81,10 @@ describe('lib/origami-service', () => {
 			assert.strictEqual(origamiService.defaults.defaultLayout, false);
 		});
 
+		it('has an `handlebarsHelpers` property', () => {
+			assert.deepEqual(origamiService.defaults.handlebarsHelpers, {});
+		});
+
 		it('has an `environment` property', () => {
 			assert.strictEqual(origamiService.defaults.environment, 'development');
 		});
@@ -154,6 +158,7 @@ describe('lib/origami-service', () => {
 				},
 				basePath: 'mock-base-path',
 				defaultLayout: 'mock-default-layout',
+				handlebarsHelpers: { helps: () => 'Offer mock help'},
 				environment: 'test',
 				exposeErrorEndpoint: false,
 				goodToGoTest: sinon.spy(),
@@ -213,7 +218,8 @@ describe('lib/origami-service', () => {
 				defaultLayout: options.defaultLayout,
 				extname: 'html',
 				layoutsDir: 'mock-base-path/views/layouts',
-				partialsDir: 'mock-base-path/views/partials'
+				partialsDir: 'mock-base-path/views/partials',
+				helpers: options.handlebarsHelpers
 			});
 			assert.calledOnce(express.mockApp.engine);
 			assert.calledWithExactly(express.mockApp.engine, 'html', expressHandlebars.mockInstance.engine);
