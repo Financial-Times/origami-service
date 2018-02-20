@@ -99,6 +99,7 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `about`: About information to populate the `/__about` endpoint with. This should be an object which conforms to the FT's [about/runbook standard][about-standard]. This defaults the `name/purpose` properties to `name/description` from your `package.json` file if they're not set. This option gets passed on to [Express Web Service]
   - `basePath`: The base path of the application, which paths (e.g. public files) will be relative to. Defaults to `process.cwd()`
   - `defaultLayout`: The default layout file to use in view rendering. This should be the name of an HTML file in the `views/layouts` directory, e.g. `'main'` would map to `views/layouts/main.html`. Defaults to `false`
+  - `handlebarsHelpers`: Handlebars helpers configuration. This should be an object. Defaults to an empty object.
   - `exposeErrorEndpoint/EXPOSE_ERROR_ENDPOINT`: Whether to expose the `/__error` endpoint for debugging purposes. This should be `false` in production. Defaults to `false`
   - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`
   - `goodToGoTest`: A function to use in calculating whether the application is good to go. See [Express Web Service] for more information
