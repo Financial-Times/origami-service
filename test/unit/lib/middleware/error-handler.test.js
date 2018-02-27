@@ -352,7 +352,7 @@ describe('lib/middleware/error-handler', () => {
 
 				beforeEach(() => {
 					express.mockRequest.url = 'mock-url';
-					express.mockRequest.app.origami = {
+					express.mockRequest.app.ft = {
 						log,
 						options: {
 							sentryDsn: 'mock-sentry-dsn'
