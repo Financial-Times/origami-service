@@ -19,6 +19,10 @@ Migrating from 2.0 to 3.0
 
 Origami Service 3.0 renames the `app.origami` property to `app.ft`. This is also renamed in the views, the global `origami` view variable is named `ft`.
 
+### Logs
+
+Origami Service 3.0 doesn't include `/__gtg` and `/__health` endpoints in the request logs.
+
 
 Migrating from 1.0 to 2.0
 -------------------------
