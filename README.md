@@ -83,7 +83,7 @@ Some middleware will also be mounted by default, in this order:
 
   - [Express Web Service]: To provide `/__about`, `/__health`, and `/__gtg` endpoints (as well as `/__error` if configured to)
   - [Next Metrics]: To send request/response data to Graphite
-  - [Morgan]: To log requests
+  - [Morgan]: To log requests (requests to `/__gtg`, `/__health`, and `/favicon.ico` are never logged)
   - [Static]: To serve files in the application's `public` folder
 
 ### Options

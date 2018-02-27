@@ -309,6 +309,32 @@ describe('lib/origami-service', () => {
 				assert.isFalse(app);
 			});
 
+			describe('when `request.path` is `"/__gtg"`', () => {
+
+				beforeEach(() => {
+					express.mockRequest.path = '/__gtg';
+					app = skip(express.mockRequest);
+				});
+
+				it('returns `true`', () => {
+					assert.isTrue(app);
+				});
+
+			});
+
+			describe('when `request.path` is `"/__health"`', () => {
+
+				beforeEach(() => {
+					express.mockRequest.path = '/__health';
+					app = skip(express.mockRequest);
+				});
+
+				it('returns `true`', () => {
+					assert.isTrue(app);
+				});
+
+			});
+
 			describe('when `request.path` is `"/favicon.ico"`', () => {
 
 				beforeEach(() => {
