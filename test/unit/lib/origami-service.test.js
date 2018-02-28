@@ -219,7 +219,10 @@ describe('lib/origami-service', () => {
 				extname: 'html',
 				layoutsDir: 'mock-base-path/views/layouts',
 				partialsDir: 'mock-base-path/views/partials',
-				helpers: options.handlebarsHelpers
+				helpers: options.handlebarsHelpers,
+				compilerOptions: {
+					preventIndent: true
+				}
 			});
 			assert.calledOnce(express.mockApp.engine);
 			assert.calledWithExactly(express.mockApp.engine, 'html', expressHandlebars.mockInstance.engine);
