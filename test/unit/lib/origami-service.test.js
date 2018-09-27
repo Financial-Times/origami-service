@@ -93,8 +93,8 @@ describe('lib/origami-service', () => {
 			assert.isFalse(origamiService.defaults.exposeErrorEndpoint);
 		});
 
-		it('has a `graphiteApiKey` property', () => {
-			assert.isNull(origamiService.defaults.graphiteApiKey);
+		it('has a `graphiteAppUUID` property', () => {
+			assert.isNull(origamiService.defaults.graphiteAppUUID);
 		});
 
 		it('has a `log` property', () => {
@@ -144,7 +144,7 @@ describe('lib/origami-service', () => {
 			// Define options in the environment and
 			// as an object (which takes priority)
 			process.env.EXPOSE_ERROR_ENDPOINT = '';
-			process.env.GRAPHITE_API_KEY = 'env-graphite-api-key';
+			process.env.FT_GRAPHITE_APP_UUID = 'env-graphite-app-uuid';
 			process.env.NODE_ENV = 'production';
 			process.env.PORT = 5678;
 			process.env.REGION = 'The Moon';
@@ -162,7 +162,7 @@ describe('lib/origami-service', () => {
 				environment: 'test',
 				exposeErrorEndpoint: false,
 				goodToGoTest: sinon.spy(),
-				graphiteApiKey: 'mock-graphite-api-key',
+				graphiteAppUUID: 'mock-graphite-app-uuid',
 				healthCheck: sinon.spy(),
 				log: log,
 				metricsAppName: 'mock-metrics-app-name',
@@ -184,7 +184,7 @@ describe('lib/origami-service', () => {
 			assert.deepEqual(defaults.firstCall.args[2], {
 				environment: process.env.NODE_ENV,
 				exposeErrorEndpoint: process.env.EXPOSE_ERROR_ENDPOINT,
-				graphiteApiKey: process.env.GRAPHITE_API_KEY,
+				graphiteAppUUID: 'env-graphite-app-uuid',
 				port: process.env.PORT,
 				region: process.env.REGION,
 				sentryDsn: process.env.SENTRY_DSN
@@ -241,9 +241,7 @@ describe('lib/origami-service', () => {
 			assert.calledOnce(nextMetrics.mockInstance.init);
 			assert.calledWith(nextMetrics.mockInstance.init, {
 				app: options.metricsAppName,
-				flushEvery: 40000,
-				ftApiKey: options.graphiteApiKey,
-				hostedApiKey: false
+				flushEvery: 40000
 			});
 		});
 
@@ -534,12 +532,12 @@ describe('lib/origami-service', () => {
 
 		});
 
-		describe('when `options.graphiteApiKey` is set to `null`', () => {
+		describe('when `options.graphiteAppUUID` is set to `null`', () => {
 
 			beforeEach(() => {
 				nextMetrics.Metrics.reset();
 				nextMetrics.mockInstance.init.reset();
-				options.graphiteApiKey = null;
+				options.graphiteAppUUID = null;
 				app = origamiService(options);
 			});
 
@@ -555,7 +553,7 @@ describe('lib/origami-service', () => {
 
 			it('warns that metrics are not set up', () => {
 				assert.called(options.log.warn);
-				assert.calledWith(options.log.warn, 'Warning: metrics are not being recorded for this application. Please provide a GRAPHITE_API_KEY environment variable');
+				assert.calledWith(options.log.warn, 'Warning: metrics are not being recorded for this application. Please provide a FT_GRAPHITE_APP_UUID environment variable');
 			});
 
 		});

@@ -30,7 +30,7 @@
     "lodash": "^4.17.4",
     "morgan": "^1.9.0",
     "ms": "^2.0.0",
-    "next-metrics": "^1.48.6",
+    "next-metrics": "^3.0.3",
     "raven": "^2.2.1",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",

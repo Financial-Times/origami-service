@@ -8,8 +8,19 @@ Origami Service's API changes between major versions. This is a guide to help yo
 Table Of Contents
 -----------------
 
+  - [Migrating from 3.0 to 4.0](#migrating-from-30-to-40)
   - [Migrating from 2.0 to 3.0](#migrating-from-20-to-30)
   - [Migrating from 1.0 to 2.0](#migrating-from-10-to-20)
+
+
+Migrating from 2.0 to 3.0
+-------------------------
+
+### Options
+
+Configuration options have been renamed:
+
+  - `graphiteApiKey` and `GRAPHITE_API_KEY` should be replaced with `graphiteAppUUID` and `FT_GRAPHITE_APP_UUID`. We now require each application to provide its own Graphite UUID.
 
 
 Migrating from 2.0 to 3.0

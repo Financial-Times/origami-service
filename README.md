@@ -103,7 +103,7 @@ The available options are as follows. Where two names are separated by a `/`, th
   - `exposeErrorEndpoint/EXPOSE_ERROR_ENDPOINT`: Whether to expose the `/__error` endpoint for debugging purposes. This should be `false` in production. Defaults to `false`
   - `environment/NODE_ENV`: The environment to run in. This affects things like public file max ages. One of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`
   - `goodToGoTest`: A function to use in calculating whether the application is good to go. See [Express Web Service] for more information
-  - `graphiteApiKey/GRAPHITE_API_KEY`: The API key to use when accessing the FT's internal Graphite instance. If set to `null`, metrics will not be reported. Defaults to `null`
+  - `graphiteAppUUID/FT_GRAPHITE_APP_UUID`: The graphite UUID to use when recording metrics.
   - `healthCheck`: A function to use in calculating how healthy the application is. See [Express Web Service] for more information
   - `log`: A console object used to output non-request logs. Defaults to the global `console` object
   - `metricsAppName`: The name of the application to use when logging to Graphite. Defaults to `about.systemCode` then `about.name`
@@ -258,8 +258,9 @@ We also maintain a [migration guide](MIGRATION.md) to help you migrate.
 
 | :grey_question: | Major Version | Last Minor Release | Node.js Versions | Support End Date |
 | :-------------- | :------------ | :----------------- | :--------------- | :--------------- |
-| :heart:         | 3             | N/A                | 8+               | N/A              |
-| :hourglass:     | 2             | 2.5                | 6-8              | 2018-08-27       |
+| :heart:         | 4             | N/A                | 8+               | N/A              |
+| :hourglass:     | 3             | 3.0                | 8                | 2019-03-27       |
+| :skull:         | 2             | 2.5                | 6-8              | 2018-08-27       |
 | :skull:         | 1             | 1.6                | 6                | 2017-05-15       |
 
 If you're opening issues related to these, please mention the version that the issue relates to.
