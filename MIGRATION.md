@@ -13,7 +13,7 @@ Table Of Contents
   - [Migrating from 1.0 to 2.0](#migrating-from-10-to-20)
 
 
-Migrating from 2.0 to 3.0
+Migrating from 3.0 to 4.0
 -------------------------
 
 ### Options
