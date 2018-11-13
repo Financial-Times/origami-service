@@ -28,7 +28,7 @@
     "express-handlebars": "^3.0.0",
     "http-errors": "^1.6.2",
     "lodash": "^4.17.4",
-    "morgan": "^1.9.0",
+    "morgan": "^1.9.1",
     "ms": "^2.0.0",
     "next-metrics": "^3.0.3",
     "raven": "^2.2.1",
