@@ -98,7 +98,7 @@ describe('lib/origami-service', () => {
 		});
 
 		it('has a `log` property', () => {
-			assert.strictEqual(origamiService.defaults.log, console);
+			assert.isObject(origamiService.defaults.log);
 		});
 
 		it('has a `port` property', () => {
