@@ -27,25 +27,25 @@
     "express": "^4.16.0",
     "express-handlebars": "^3.0.0",
     "http-errors": "^1.6.2",
-    "lodash": "^4.17.4",
-    "morgan": "^1.9.0",
+    "lodash": "^4.17.5",
+    "morgan": "^1.9.1",
     "ms": "^2.0.0",
     "next-metrics": "^3.0.3",
     "raven": "^2.2.1",
-    "request": "^2.83.0",
+    "request": "^2.84.0",
     "request-promise-native": "^1.0.5",
     "require-all": "^2.2.0",
     "varname": "^2.0.3"
   },
   "devDependencies": {
-    "@financial-times/origami-service-makefile": "^6.1.0",
-    "eslint": "^4.7.2",
+    "@financial-times/origami-service-makefile": "^6.4.0",
+    "eslint": "^4.19.1",
     "mocha": "^3.5.3",
     "mockery": "^2.1.0",
     "npm-prepublish": "^1.2.3",
-    "nyc": "^11.2.1",
-    "proclaim": "^3.4.6",
-    "sinon": "^4.0.0"
+    "nyc": "^11.9.0",
+    "proclaim": "^3.6.0",
+    "sinon": "^4.5.0"
   },
   "nyc": {
     "exclude": [
