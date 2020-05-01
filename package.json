@@ -20,7 +20,9 @@
   },
   "main": "./lib/origami-service.js",
   "scripts": {
-    "test": "make verify test"
+    "test": "make verify test",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "dependencies": {
     "@financial-times/express-web-service": "^3.3.1",
@@ -35,7 +37,8 @@
     "request": "^2.84.0",
     "request-promise-native": "^1.0.5",
     "require-all": "^2.2.0",
-    "varname": "^2.0.3"
+    "varname": "^2.0.3",
+    "snyk": "^1.316.2"
   },
   "devDependencies": {
     "@financial-times/origami-service-makefile": "^6.4.0",
@@ -53,5 +56,6 @@
       "example",
       "test"
     ]
-  }
+  },
+  "snyk": true
 }
