@@ -41,7 +41,7 @@
     "snyk": "^1.316.2"
   },
   "devDependencies": {
-    "@financial-times/origami-service-makefile": "^6.4.0",
+    "@financial-times/origami-service-makefile": "^7.0.3",
     "eslint": "^4.19.1",
     "mocha": "^3.5.3",
     "mockery": "^2.1.0",
