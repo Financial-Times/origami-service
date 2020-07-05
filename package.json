@@ -36,7 +36,7 @@
     "raven": "^2.2.1",
     "request": "^2.84.0",
     "request-promise-native": "^1.0.5",
-    "require-all": "^2.2.0",
+    "require-all": "^3.0.0",
     "varname": "^2.0.3",
     "snyk": "^1.316.2"
   },
