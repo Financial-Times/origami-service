@@ -29,7 +29,7 @@ Usage
 
 ### Requirements
 
-Running the Origami Service module requires [Node.js] 8.x and [npm]. You can install with:
+Running the Origami Service module requires [Node.js] 10.x and [npm]. You can install with:
 
 ```sh
 npm install @financial-times/origami-service
