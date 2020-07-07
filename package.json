@@ -43,7 +43,7 @@
   "devDependencies": {
     "@financial-times/origami-service-makefile": "^7.0.3",
     "eslint": "^7.4.0",
-    "mocha": "^3.5.3",
+    "mocha": "^8.0.1",
     "mockery": "^2.1.0",
     "npm-prepublish": "^1.2.3",
     "nyc": "^15.1.0",
