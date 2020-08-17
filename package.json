@@ -29,7 +29,7 @@
     "express": "^4.16.0",
     "express-handlebars": "^5.0.0",
     "http-errors": "^1.6.2",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.20",
     "morgan": "^1.9.1",
     "ms": "^2.0.0",
     "next-metrics": "^3.0.3",
