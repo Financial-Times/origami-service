@@ -1,6 +1,6 @@
 {
 	"description": "Provides an extended Express, as well as useful tools for building consistent Origami services.",
-	"origamiType": null,
+	"origamiType": "library",
 	"origamiVersion": 1,
 	"keywords": [
 		"origami"
