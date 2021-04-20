@@ -37,8 +37,8 @@
     "request": "^2.84.0",
     "request-promise-native": "^1.0.5",
     "require-all": "^3.0.0",
-    "varname": "^2.0.3",
-    "snyk": "^1.465.0"
+    "snyk": "^1.465.0",
+    "varname": "^2.0.3"
   },
   "devDependencies": {
     "@financial-times/origami-service-makefile": "^7.0.3",
