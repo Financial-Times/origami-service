@@ -96,9 +96,8 @@ describe('lib/middleware/error-handler', () => {
 				assert.calledWith(raven.mockErrorMiddleware, error, express.mockRequest, express.mockResponse);
 			});
 
-			it('logs the error and escaped error stack', () => {
-				assert.calledOnce(log.error);
-				assert.match(log.error.firstCall.args[0], /^Server Error message="Oops" status=500 stack="[^"\n]+" url="mock-url"$/);
+			it('does not log the error', () => {
+				assert.notCalled(log.error);
 			});
 
 			it('creates a cacheControl middleware', () => {
@@ -272,9 +271,8 @@ describe('lib/middleware/error-handler', () => {
 					middleware(error, express.mockRequest, express.mockResponse, next);
 				});
 
-				it('logs the error and null error stack', () => {
-					assert.calledOnce(log.error);
-					assert.calledWithExactly(log.error, 'Server Error message="Oops" status=500 stack=null url="mock-url"');
+				it('does not log the error', () => {
+					assert.notCalled(log.error);
 				});
 
 			});
