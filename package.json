@@ -15,7 +15,7 @@
     "url": "https://github.com/Financial-Times/origami-service.git"
   },
   "engines": {
-    "node": ">=10",
+    "node": ">=18",
     "npm": ">=6"
   },
   "main": "./lib/origami-service.js",
@@ -32,7 +32,7 @@
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "ms": "^2.1.3",
-    "next-metrics": "^3.0.3",
+    "next-metrics": "^10.0.2",
     "raven": "^2.6.4",
     "request": "^2.84.0",
     "request-promise-native": "^1.0.5",
