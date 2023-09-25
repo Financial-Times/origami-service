@@ -297,8 +297,8 @@ We also maintain a [migration guide](MIGRATION.md) to help you migrate.
 
 | :grey_question: | Major Version | Last Minor Release | Node.js Versions | Support End Date |
 |:----------------|:--------------|:-------------------|:-----------------|:-----------------|
-| :heart:         | 6             | N/A                | 18+              | 2025-04-30       |
-| :hourglass:     | 5             | N/A                | 10+              | 2021-04-30       |
+| :heart:         | 6             | N/A                | 18+              | N/A       |
+| :hourglass:     | 5             | N/A                | 10+              | 2023-09-01       |
 | :skull:         | 4             | 4.1                | 8+               | 2020-12-06       |
 | :skull:         | 3             | 3.0                | 8                | 2019-03-27       |
 | :skull:         | 2             | 2.5                | 6-8              | 2018-08-27       |
