@@ -1,5 +1,5 @@
 on:
-  commit:
+  push:
     branches:
       - chore/remove-origami-token-ci-testing
 
