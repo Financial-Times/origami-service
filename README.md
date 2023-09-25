@@ -22,7 +22,7 @@ Provides an extended [Express], as well as useful tools for building consistent 
 
 ### Requirements
 
-Running the Origami Service module requires [Node.js] 18.x and [npm]. You can install with:
+Running the Origami Service module requires [Node.js] and [npm]. You can install with:
 
 ```sh
 npm install @financial-times/origami-service
