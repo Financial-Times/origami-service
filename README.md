@@ -62,7 +62,6 @@ The Express application will have some additional properties, added by the Origa
 added to `app.locals` so they're available in your views.
 
 - `app.ft.log`: The logger passed in to the service
-- `app.ft.metrics`: The [Next Metrics] instance which can be used to send additional data to Graphite
 - `app.ft.options`: The defaulted [options](#options) passed into the `origamiService` call
 - `app.ft.server`: The [HTTP Server] which was returned by `app.listen`
 
@@ -82,7 +81,6 @@ Some middleware will also be mounted by default, in this order:
 
 - [Express Web Service]: To provide `/__about`, `/__health`, and `/__gtg` endpoints (as well as `/__error` if configured
   to)
-- [Next Metrics]: To send request/response data to Graphite
 - [Morgan]: To log requests (requests to `/__gtg`, `/__health`, and `/favicon.ico` are never logged)
 - [Static]: To serve files in the application's `public` folder
 
@@ -115,12 +113,9 @@ is the environment variable:
   of `'production'`, `'development'`, or `'test'`. Defaults to `'development'`
 - `goodToGoTest`: A function to use in calculating whether the application is good to go. See [Express Web Service] for
   more information
-- `graphiteAppUUID/FT_GRAPHITE_APP_UUID`: The graphite UUID to use when recording metrics.
 - `healthCheck`: A function to use in calculating how healthy the application is. See [Express Web Service] for more
   information
 - `log`: A console object used to output non-request logs. Defaults to the global `console` object
-- `metricsAppName`: The name of the application to use when logging to Graphite. Defaults to `about.systemCode`
-  then `about.name`
 - `port/PORT`: The port that the application should run on. Defaults to `8080`.
 - `region/REGION`: The region to use in logging and reporting for the application. Defaults to `'EU'`
 - `requestLogFormat`: The [Morgan] log format to output request logs in. If set to `null`, request logs will not be
@@ -340,8 +335,6 @@ This software is published by the Financial Times under the [MIT licence][licens
 [morgan]: https://github.com/expressjs/morgan
 
 [ms-examples]: https://github.com/zeit/ms#examples
-
-[next metrics]: https://github.com/Financial-Times/next-metrics
 
 [node.js]: https://nodejs.org/
 
