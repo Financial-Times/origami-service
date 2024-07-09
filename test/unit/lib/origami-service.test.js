@@ -13,7 +13,6 @@ describe('lib/origami-service', () => {
 	let log;
 	let manifest;
 	let morgan;
-	let nextMetrics;
 	let origamiService;
 	let raven;
 	let requireAll;
@@ -43,9 +42,6 @@ describe('lib/origami-service', () => {
 
 		morgan = require('../mock/morgan.mock');
 		mockery.registerMock('morgan', morgan);
-
-		nextMetrics = require('../mock/next-metrics.mock');
-		mockery.registerMock('next-metrics', nextMetrics);
 
 		raven = require('../mock/raven.mock');
 		mockery.registerMock('raven', raven);
@@ -165,7 +161,6 @@ describe('lib/origami-service', () => {
 				graphiteAppUUID: 'mock-graphite-app-uuid',
 				healthCheck: sinon.spy(),
 				log: log,
-				metricsAppName: 'mock-metrics-app-name',
 				port: 1234,
 				region: 'US',
 				requestLogFormat: 'mock-log-format',
@@ -234,31 +229,6 @@ describe('lib/origami-service', () => {
 
 		it('sets the `view engine` Express setting', () => {
 			assert.calledWithExactly(express.mockApp.set, 'view engine', 'html');
-		});
-
-		it('configures and initialises Next Metrics', () => {
-			assert.calledOnce(nextMetrics.Metrics);
-			assert.calledOnce(nextMetrics.mockInstance.init);
-			assert.calledWith(nextMetrics.mockInstance.init, {
-				app: options.metricsAppName,
-				flushEvery: 40000
-			});
-		});
-
-		it('mounts a middleware which instruments the request and response with Next Metrics', () => {
-			const middleware = app.use.firstCall.args[0];
-			const next = sinon.spy();
-			assert.notCalled(nextMetrics.mockInstance.instrument);
-			middleware(express.mockRequest, express.mockResponse, next);
-			assert.calledTwice(nextMetrics.mockInstance.instrument);
-			assert.calledWith(nextMetrics.mockInstance.instrument, express.mockRequest, {
-				as: 'express.http.req'
-			});
-			assert.calledWith(nextMetrics.mockInstance.instrument, express.mockResponse, {
-				as: 'express.http.res'
-			});
-			assert.calledOnce(next);
-			assert.calledWithExactly(next);
 		});
 
 		it('configures and installs Raven', () => {
@@ -385,11 +355,6 @@ describe('lib/origami-service', () => {
 		it('stores the logger in `app.ft.log`', () => {
 			assert.strictEqual(express.mockApp.ft.log.info, options.log.info);
 		});
-
-		it('stores the Next Metrics instance in `app.ft.metrics`', () => {
-			assert.strictEqual(express.mockApp.ft.metrics, nextMetrics.mockInstance);
-		});
-
 		it('stores a copy of `app.ft` in `app.locals.ft`', () => {
 			assert.strictEqual(express.mockApp.ft, express.mockApp.locals.ft);
 		});
@@ -484,37 +449,6 @@ describe('lib/origami-service', () => {
 
 		});
 
-		describe('when `options.metricsAppName` is not set', () => {
-
-			beforeEach(() => {
-				delete options.metricsAppName;
-				nextMetrics.mockInstance.init.reset();
-				app = origamiService(options);
-			});
-
-			it('uses `options.about.systemCode` as the app name in Next Metrics', () => {
-				assert.calledOnce(nextMetrics.mockInstance.init);
-				assert.strictEqual(nextMetrics.mockInstance.init.firstCall.args[0].app, options.about.systemCode);
-			});
-
-		});
-
-		describe('when `options.metricsAppName` and `options.about.systemCode` are not set', () => {
-
-			beforeEach(() => {
-				delete options.metricsAppName;
-				delete options.about.systemCode;
-				nextMetrics.mockInstance.init.reset();
-				app = origamiService(options);
-			});
-
-			it('uses `options.about.name` as the app name in Next Metrics', () => {
-				assert.calledOnce(nextMetrics.mockInstance.init);
-				assert.strictEqual(nextMetrics.mockInstance.init.firstCall.args[0].app, options.about.name);
-			});
-
-		});
-
 		describe('when `options.environment` is set to "production"', () => {
 
 			beforeEach(() => {
@@ -528,32 +462,6 @@ describe('lib/origami-service', () => {
 				assert.calledWithExactly(express.static, 'mock-base-path/public', {
 					maxAge: 604800000
 				});
-			});
-
-		});
-
-		describe('when `options.graphiteAppUUID` is set to `null`', () => {
-
-			beforeEach(() => {
-				nextMetrics.Metrics.reset();
-				nextMetrics.mockInstance.init.reset();
-				options.graphiteAppUUID = null;
-				app = origamiService(options);
-			});
-
-			it('does not create or initialise Next Metrics', () => {
-				assert.notCalled(nextMetrics.Metrics);
-				assert.notCalled(nextMetrics.mockInstance.init);
-			});
-
-			it('stores a mock instance in `app.ft.metrics`', () => {
-				assert.isObject(express.mockApp.ft.metrics);
-				assert.isFunction(express.mockApp.ft.metrics.count);
-			});
-
-			it('warns that metrics are not set up', () => {
-				assert.called(options.log.warn);
-				assert.calledWith(options.log.warn, 'Warning: metrics are not being recorded for this application. Please provide a FT_GRAPHITE_APP_UUID environment variable');
 			});
 
 		});

@@ -8,11 +8,19 @@ Origami Service's API changes between major versions. This is a guide to help yo
 Table Of Contents
 -----------------
 
+  - [Migrating from 6.0 to 7.0](#migrating-from-60-to-70)
   - [Migrating from 5.0 to 6.0](#migrating-from-50-to-60)
   - [Migrating from 4.0 to 5.0](#migrating-from-40-to-50)
   - [Migrating from 3.0 to 4.0](#migrating-from-30-to-40)
   - [Migrating from 2.0 to 3.0](#migrating-from-20-to-30)
   - [Migrating from 1.0 to 2.0](#migrating-from-10-to-20)
+
+Migrating from 6.0 to 7.0
+-------------------------
+
+`next-metrics` has been removed as a dependency, meaning metrics will no longer be provided.
+
+If you still require metrics, please follow EDO's guide to [remove graphite from apps](https://financialtimes.atlassian.net/wiki/spaces/DS/pages/8408989698/Migrating+an+app+away+from+Graphite-based+health+checks).
 
 Migrating from 5.0 to 6.0
 -------------------------
